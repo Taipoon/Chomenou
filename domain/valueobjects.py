@@ -2,6 +2,8 @@ import datetime
 
 
 class Amount(object):
+    UnitName = "円"
+
     def __init__(self, amount: int):
         self._amount = amount
 
@@ -10,8 +12,12 @@ class Amount(object):
         return self._amount
 
     @property
-    def value_with_yen(self) -> str:
-        return str(self.value) + "円"
+    def value_with_unit(self) -> str:
+        return str(self.value) + self.UnitName
+
+    @property
+    def comma_value_with_unit(self) -> str:
+        return f"{self.value:,} {self.UnitName}"
 
 
 class StatementCreatedAt(object):
@@ -19,12 +25,16 @@ class StatementCreatedAt(object):
         self._created_at = created_at
 
     @property
-    def created_at(self) -> str:
+    def datetime(self) -> datetime.datetime:
+        return datetime.datetime.strptime(self._created_at, "%Y-%m-%d %H:%M:%S")
+
+    @property
+    def raw_str(self) -> str:
         return self._created_at
 
     @property
-    def created_at_datetime(self) -> datetime.datetime:
-        return datetime.datetime.strptime(self._created_at, "%Y-%m-%d %H:%M:%s")
+    def standard_format(self) -> str:
+        return self.datetime.strftime("%Y年%m月%d日 %H時%M分%S秒")
 
 
 class FiscalYear(object):

@@ -4,7 +4,7 @@ PRAGMA foreign_keys=false;
 DROP TABLE IF EXISTS `account_types`;
 DROP TABLE IF EXISTS `accounts`;
 DROP TABLE IF EXISTS `statements`;
-DROP TABLE IF EXISTS  `financial_years`;
+DROP TABLE IF EXISTS  `fiscal_years`;
 
 
 PRAGMA foreign_keys=true;
@@ -45,10 +45,10 @@ CREATE TABLE IF NOT EXISTS `statements` (
 );
 
 
-CREATE TABLE IF NOT EXISTS `fiscal_year` (
+CREATE TABLE IF NOT EXISTS `fiscal_years` (
     `year` INTEGER PRIMARY KEY
 );
-INSERT INTO `fiscal_year` (`year`)
+INSERT INTO `fiscal_years` (`year`)
 VALUES (2020),
        (2021),
        (2022);

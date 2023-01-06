@@ -16,7 +16,7 @@ class MainWindow(Ui_MainWindow):
 
 
 class MainWindowPresenter(object):
-    def __init__(self, view: MainWindow, model: IStatement) -> None:
+    def __init__(self, view: Ui_MainWindow, model: IStatement) -> None:
         self._view = view
         self._model = model
         self._bind()
@@ -25,9 +25,11 @@ class MainWindowPresenter(object):
         self._view.getButton.clicked.connect(self.get_button_clicked)
 
     def get_button_clicked(self):
-        statements = self._model.all()
+        statements = self._model.all(2000)
+
+        self._view.statementTable.clear()
         self._view.statementTable.setRowCount(len(statements))
 
         for idx, statement in enumerate(statements):
             self._view.statementTable.setItem(idx, 0, QTableWidgetItem(statement.account.name))
-            self._view.statementTable.setItem(idx, 1, QTableWidgetItem(statement.amount.value_with_yen))
+            self._view.statementTable.setItem(idx, 1, QTableWidgetItem(statement.amount.comma_value_with_unit))

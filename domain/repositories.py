@@ -1,7 +1,7 @@
 import abc
 
 from domain.entities import AccountType, Account, Statement
-from domain.value_objects import FiscalYear
+from domain.valueobjects import FiscalYear
 
 
 class IAccountType(metaclass=abc.ABCMeta):
@@ -26,15 +26,15 @@ class IAccount(metaclass=abc.ABCMeta):
 
 class IStatement(metaclass=abc.ABCMeta):
     @abc.abstractmethod
-    def all(self) -> list[Statement]:
+    def all(self, year: int) -> list[Statement]:
         pass
 
     @abc.abstractmethod
-    def get(self, month: int, day: int, account: Account):
+    def get(self, year: int, month: int, day: int, account: Account):
         pass
 
     @abc.abstractmethod
-    def insert(self, statements: list[Statement]):
+    def insert(self, year: int, statements: list[Statement]):
         pass
 
     @abc.abstractmethod

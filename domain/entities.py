@@ -1,5 +1,4 @@
-from domain.value_objects import StatementCreatedAt, Amount
-from domain.staticvalues import *
+from domain.valueobjects import StatementCreatedAt, Amount
 
 
 class AccountType(object):
@@ -23,18 +22,13 @@ class AccountType(object):
     def name(self) -> str:
         return self._type_name
 
-# TODO: DBと同期をするためのインメモリオブジェクトと、DTOを同一視して扱おうとするからおかしい
-# TODO: DBのインメモリオブジェクト（定数）は、その役割を持つものとして staticvalues.Accounts.Account()に作成
-# TODO: DBからの取得値を運ぶDTOは、その役割を持つものとしてentities.AccountDTOを作成し、中で上記オブジェクトを使って条件分岐
-# TODO: AccountTypeも同様に2種類定義し、それらをentities.Statementに渡して集約とする．
-
 
 class Account(object):
-    def __init__(self, account_id: int, account_name: str, account_type: AccountType = None,
+    def __init__(self, account_id: int, account_name: str, account_type: AccountType,
                  default_amount: Amount = None):
         self._account_id = account_id
-        self._account_name = account_name or self.name
-        self._account_type = account_type or self.type
+        self._account_name = account_name
+        self._account_type = account_type
         self._default_amount = default_amount or 0
 
     def __eq__(self, other):
@@ -45,34 +39,20 @@ class Account(object):
     def __ne__(self, other):
         return not self.__eq__(other)
 
+    def __str__(self):
+        return self._account_name
+
     @property
     def id(self) -> int:
         return self._account_id
 
     @property
     def name(self) -> str:
-        if self == Accounts.Settai:
-            return Accounts.Settai.name
-
-        if self == Accounts.Shiire:
-            return Accounts.Shiire.name
-
-        if self == Accounts.Uriage:
-            return Accounts.Uriage.name
-
-        if self == Accounts.Oshibori:
-            return Accounts.Oshibori.name
+        return self._account_name
 
     @property
     def type(self) -> AccountType:
-        if self == AccountTypes.VariableCost:
-            return AccountTypes.VariableCost.name
-
-        if self == AccountTypes.FixedCost:
-            return AccountTypes.FixedCost.name
-
-        if self == AccountTypes.Sales:
-            return AccountTypes.Sales.name
+        return self._account_type
 
     @property
     def default_amount(self) -> Amount:
@@ -80,12 +60,19 @@ class Account(object):
 
 
 class Statement(object):
-    def __init__(self, month: int, day: int, account: Account, amount: Amount.value, created_at: StatementCreatedAt):
+    def __init__(self, month: int, day: int, account_id: int, amount: Amount, created_at: StatementCreatedAt):
         self._month = month
         self._day = day
-        self._account = account
+        self._account_id = account_id
         self._amount = amount
         self._created_at = created_at
+
+    def __str__(self):
+        s = f"""\
+{self.account_type.name}[{self.account_type.name}]({self._account_id}): \
+{self.amount.value}円 @ {self.created_at.standard_format}     
+"""
+        return s
 
     @property
     def month(self) -> int:
@@ -97,12 +84,29 @@ class Statement(object):
 
     @property
     def account(self) -> Account:
-        return self._account
+        if self._account_id == Shiire.id:
+            return Shiire
+        if self._account_id == Settai.id:
+            return Settai
+        if self._account_id == Uriage.id:
+            return Uriage
+        if self._account_id == Oshibori.id:
+            return Oshibori
 
     @property
-    def amount(self) -> Amount.value:
+    def amount(self) -> Amount:
         return self._amount
 
     @property
     def created_at(self) -> StatementCreatedAt:
         return self._created_at
+
+
+VariableCost = AccountType(1, "変動費")
+FixedCost = AccountType(2, "固定費")
+Sales = AccountType(3, "売上")
+
+Shiire = Account(1, "仕入", VariableCost)
+Settai = Account(2, "接待", VariableCost)
+Uriage = Account(3, "売上", Sales)
+Oshibori = Account(4, "おしぼり", FixedCost, Amount(8800))
