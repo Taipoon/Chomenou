@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>EditKanjoKamoku</class>
- <widget class="QDialog" name="EditKanjoKamoku">
+ <class>AccountsEditorDialog</class>
+ <widget class="QDialog" name="AccountsEditorDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -22,59 +22,59 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QLabel" name="label">
+    <widget class="QLabel" name="_label">
      <property name="text">
       <string>固定費として事前入力したい金額を変更できます</string>
      </property>
     </widget>
    </item>
    <item>
-    <layout class="QFormLayout" name="formLayout">
+    <layout class="QFormLayout" name="_formLayout">
      <item row="0" column="0">
-      <widget class="QLabel" name="oshibori_label">
+      <widget class="QLabel" name="label_oshibori">
        <property name="text">
         <string>おしぼり</string>
        </property>
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QLineEdit" name="oshibori_line_edit"/>
+      <widget class="QLineEdit" name="lineEdit_oshibori"/>
      </item>
      <item row="1" column="1">
-      <widget class="QLineEdit" name="kuzyoki_line_edit"/>
+      <widget class="QLineEdit" name="lineEdit_kujoki"/>
      </item>
      <item row="2" column="0">
-      <widget class="QLabel" name="lease_ueki_label">
+      <widget class="QLabel" name="label_risueki">
        <property name="text">
         <string>リース植木</string>
        </property>
       </widget>
      </item>
      <item row="2" column="1">
-      <widget class="QLineEdit" name="lease_line_edit"/>
+      <widget class="QLineEdit" name="lineEdit_risueki"/>
      </item>
      <item row="3" column="0">
-      <widget class="QLabel" name="tyosakuken_label">
+      <widget class="QLabel" name="label_chosakuken">
        <property name="text">
         <string>著作権</string>
        </property>
       </widget>
      </item>
      <item row="3" column="1">
-      <widget class="QLineEdit" name="tyosakuken_line_edit"/>
+      <widget class="QLineEdit" name="lineEdit_chosakuken"/>
      </item>
      <item row="4" column="0">
-      <widget class="QLabel" name="karaoke_label">
+      <widget class="QLabel" name="label_karaoke">
        <property name="text">
         <string>カラオケ</string>
        </property>
       </widget>
      </item>
      <item row="4" column="1">
-      <widget class="QLineEdit" name="karaoke_line_edit"/>
+      <widget class="QLineEdit" name="lineEdit_karaoke"/>
      </item>
      <item row="1" column="0">
-      <widget class="QLabel" name="kuzyoki_label">
+      <widget class="QLabel" name="label_kujoki">
        <property name="text">
         <string>駆除器</string>
        </property>
@@ -99,7 +99,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>EditKanjoKamoku</receiver>
+   <receiver>AccountsEditorDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -115,7 +115,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>EditKanjoKamoku</receiver>
+   <receiver>AccountsEditorDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
