@@ -4,13 +4,13 @@ from domain.entities import AccountType, Account, Statement
 from domain.valueobjects import FiscalYear
 
 
-class IAccountType(metaclass=abc.ABCMeta):
+class AccountTypeAbstractModel(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def all(self) -> list[AccountType]:
         pass
 
 
-class IAccount(metaclass=abc.ABCMeta):
+class AccountAbstractModel(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def all(self) -> list[Account]:
         pass
@@ -24,7 +24,7 @@ class IAccount(metaclass=abc.ABCMeta):
         pass
 
 
-class IStatement(metaclass=abc.ABCMeta):
+class StatementAbstractModel(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def all(self, year: int) -> list[Statement]:
         pass
@@ -42,7 +42,7 @@ class IStatement(metaclass=abc.ABCMeta):
         pass
 
 
-class IFiscalYear(metaclass=abc.ABCMeta):
+class FiscalYearAbstractModel(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def all(self) -> list[FiscalYear]:
         pass

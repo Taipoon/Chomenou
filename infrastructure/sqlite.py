@@ -2,7 +2,12 @@ import os.path
 import sqlite3
 
 from domain.entities import AccountType, Account, Statement
-from domain.repositories import IAccountType, IAccount, IStatement, IFiscalYear
+from domain.repositories import (
+    AccountTypeAbstractModel,
+    AccountAbstractModel,
+    StatementAbstractModel,
+    FiscalYearAbstractModel
+)
 from domain.valueobjects import FiscalYear, StatementCreatedAt, Amount
 
 
@@ -22,7 +27,7 @@ class SQLiteBase(object):
             self.__class__._conn.close()
 
 
-class AccountTypeSQLite(SQLiteBase, IAccountType):
+class AccountTypeSQLite(SQLiteBase, AccountTypeAbstractModel):
     def __init__(self):
         super().__init__()
 
@@ -30,7 +35,7 @@ class AccountTypeSQLite(SQLiteBase, IAccountType):
         pass
 
 
-class AccountSQLite(SQLiteBase, IAccount):
+class AccountSQLite(SQLiteBase, AccountAbstractModel):
     def __init__(self):
         super().__init__()
 
@@ -44,7 +49,7 @@ class AccountSQLite(SQLiteBase, IAccount):
         pass
 
 
-class StatementSQLite(SQLiteBase, IStatement):
+class StatementSQLite(SQLiteBase, StatementAbstractModel):
     def __init__(self):
         super().__init__()
 
@@ -69,7 +74,7 @@ class StatementSQLite(SQLiteBase, IStatement):
         pass
 
 
-class FiscalYearSQLite(SQLiteBase, IFiscalYear):
+class FiscalYearSQLite(SQLiteBase, FiscalYearAbstractModel):
     def __init__(self):
         super().__init__()
 

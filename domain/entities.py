@@ -69,7 +69,7 @@ class Statement(object):
 
     def __str__(self):
         s = f"""\
-{self.account_type.name}[{self.account_type.name}]({self._account_id}): \
+{self.account.type.name}[{self.account.name}]({self._account_id}): \
 {self.amount.value}円 @ {self.created_at.standard_format}     
 """
         return s

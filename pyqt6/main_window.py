@@ -1,35 +1,38 @@
-import os.path
+import os
+import sys
 
 from PyQt6 import uic
-from PyQt6.QtWidgets import QTableWidgetItem
+from PyQt6.QtWidgets import QMainWindow, QApplication
 
-from domain.repositories import IStatement
+from domain.repositories import StatementAbstractModel
 from infrastructure.sqlite import StatementSQLite
-from pyqt6.uifile.test_window import Ui_MainWindow
+from pyqt6.bulk_insertion_dialog import BulkInsertionDialog
 
 
-class MainWindow(Ui_MainWindow):
+class MainWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
-        uic.loadUi(os.path.join(os.path.dirname(__file__), "uifile", "test_window.ui"), self)
-        self._presenter = MainWindowPresenter(self, StatementSQLite())
+        uic.loadUi(os.path.join(os.path.dirname(__file__), "ui_files", "mainWindow.ui"), self)
+        # self._presenter = MainWindowPresenter(self, StatementSQLite())
+        self.pshBtn_goToday.clicked.connect(self.show_bulk_insert_dialog)
+
+    def show_bulk_insert_dialog(self):
+        dialog = BulkInsertionDialog()
+        dialog.exec()
 
 
 class MainWindowPresenter(object):
-    def __init__(self, view: Ui_MainWindow, model: IStatement) -> None:
+    def __init__(self, view: MainWindow, model: StatementAbstractModel) -> None:
         self._view = view
         self._model = model
         self._bind()
 
     def _bind(self):
-        self._view.getButton.clicked.connect(self.get_button_clicked)
+        pass
 
-    def get_button_clicked(self):
-        statements = self._model.all(2000)
 
-        self._view.statementTable.clear()
-        self._view.statementTable.setRowCount(len(statements))
-
-        for idx, statement in enumerate(statements):
-            self._view.statementTable.setItem(idx, 0, QTableWidgetItem(statement.account.name))
-            self._view.statementTable.setItem(idx, 1, QTableWidgetItem(statement.amount.comma_value_with_unit))
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    sys.exit(app.exec())
