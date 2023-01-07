@@ -4,7 +4,7 @@ PRAGMA foreign_keys=false;
 DROP TABLE IF EXISTS `account_types`;
 DROP TABLE IF EXISTS `accounts`;
 DROP TABLE IF EXISTS `statements`;
-DROP TABLE IF EXISTS  `fiscal_years`;
+DROP TABLE IF EXISTS `fiscal_years`;
 
 
 PRAGMA foreign_keys=true;

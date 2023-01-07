@@ -37,10 +37,6 @@ class StatementAbstractModel(metaclass=abc.ABCMeta):
     def insert(self, year: int, statements: list[Statement]):
         pass
 
-    @abc.abstractmethod
-    def sorted_created_at_desc(self) -> list[Statement]:
-        pass
-
 
 class FiscalYearAbstractModel(metaclass=abc.ABCMeta):
     @abc.abstractmethod
