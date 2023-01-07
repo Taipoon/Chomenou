@@ -14,6 +14,9 @@ class AccountType(object):
     def __ne__(self, other):
         return not self.__eq__(other)
 
+    def __str__(self):
+        return f"{self.name}({self.id})"
+
     @property
     def id(self) -> int:
         return self._type_id
@@ -69,7 +72,7 @@ class Statement(object):
 
     def __str__(self):
         s = f"""\
-{self.account.type.name}[{self.account.name}]({self._account_id}): \
+{self.account.name}:{self.month}月{self.day}日[{self.account.type.name}]({self._account_id}): \
 {self.amount.value}円 @ {self.created_at.standard_format}     
 """
         return s

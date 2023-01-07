@@ -1,7 +1,7 @@
 import os.path
 import sqlite3
 
-from domain.entities import AccountType, Account, Statement
+from domain.entities import AccountType, Account, Statement, Shiire
 from domain.repositories import (
     AccountTypeAbstractModel,
     AccountAbstractModel,
@@ -52,27 +52,28 @@ class AccountSQLite(SQLiteBase, AccountAbstractModel):
         return self.get()
 
     def get(self, accounts: list[Account] = None) -> list[Account]:
-        sql = ("SELECT `a`.`id`, `a`.`account_name`, `a`.`account_type_id`, `a`.`default_amount`, `at`.`type_name`" +
-               "FROM `accounts` AS `a` LEFT JOIN `account_types` AS `at`")
+        sql = "SELECT `a`.`id`, `a`.`account_name`, `a`.`account_type_id`, `a`.`default_amount`, `at`.`type_name` " \
+              "FROM `accounts` AS `a` LEFT JOIN `account_types` AS `at` " \
+              "ON `a`.`account_type_id` = `at`.`id`"
 
         conditions = []
         if accounts:
-            for account in accounts:
-                conditions.append("id = " + str(account.id))
+            for a in accounts:
+                conditions.append("id = " + str(a.id))
             sql += " WHERE " + " AND ".join(conditions)
-        print(sql)
-        accounts = []
+
+        result_accounts = []
         cursor: sqlite3.Cursor = self.conn.cursor()
         try:
             cursor.execute(sql)
             for row in cursor:
                 account_id, account_name, account_type_id, default_amount, type_name = row
-                accounts.append(Account(account_id=account_id, account_name=account_name,
-                                        account_type=AccountType(type_id=account_type_id, type_name=type_name),
-                                        default_amount=default_amount))
+                result_accounts.append(Account(account_id=account_id, account_name=account_name,
+                                               account_type=AccountType(type_id=account_type_id, type_name=type_name),
+                                               default_amount=default_amount))
         finally:
             cursor.close()
-            return accounts
+            return result_accounts
 
     def update_default_amount(self, account_name: str, amount: int) -> bool:
         sql = f"UPDATE `accounts` SET `default_amount` = {amount} WHERE `account_name` = {account_name}"
@@ -111,8 +112,7 @@ class StatementSQLite(SQLiteBase, StatementAbstractModel):
     def get(self, year: int, month: int, day: int, account: Account = None) -> list[Statement]:
         sql = f"SELECT `month`, `day`, `account_id`, `amount`, `created_at` " \
               f"FROM `{year}` " \
-              f"WHERE `month` = {month} " \
-              f"AND `day` = {day}"
+              f"WHERE `month` = {month} AND `day` = {day}"
 
         if account:
             sql += f" AND `account_id` = {account.id}"
@@ -164,8 +164,43 @@ class FiscalYearSQLite(SQLiteBase, FiscalYearAbstractModel):
         try:
             cursor.execute(sql)
             for row in cursor:
-                year, = row
-                fiscal_years.append(FiscalYear(year=year))
+                fiscal_years.append(FiscalYear(year=row[0]))
         finally:
             cursor.close()
             return fiscal_years
+
+
+if __name__ == '__main__':
+
+    account_sqlite = AccountSQLite()
+    accounts = account_sqlite.all()
+    for account in accounts:
+        print(account)
+
+    print("-" * 100)
+
+    statements = StatementSQLite()
+    rs = statements.all(2000)
+    for r in rs:
+        print(r)
+
+    print("-" * 100)
+
+    statements = StatementSQLite()
+    rs = statements.get(2000, 1, 1)
+    for r in rs:
+        print(r)
+
+    print("-" * 100)
+
+    account_types = AccountTypeSQLite()
+    types = account_types.all()
+    for t in types:
+        print(t)
+
+    print("-" * 100)
+
+    fiscal_year = FiscalYearSQLite()
+    years = fiscal_year.all()
+    for y in years:
+        print(y)

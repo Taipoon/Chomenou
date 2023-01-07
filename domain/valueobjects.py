@@ -41,6 +41,9 @@ class FiscalYear(object):
     def __init__(self, year: int):
         self._year = year
 
+    def __str__(self):
+        return f"{self.year}年"
+
     @property
     def year(self) -> int:
         return self._year
