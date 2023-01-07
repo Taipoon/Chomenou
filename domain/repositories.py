@@ -20,7 +20,7 @@ class AccountAbstractModel(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def update_default_amount(self, account_name: str, amount: int):
+    def update_default_amount(self, account: Account, amount: int):
         pass
 
 

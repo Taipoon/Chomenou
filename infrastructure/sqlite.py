@@ -75,8 +75,8 @@ class AccountSQLite(SQLiteBase, AccountAbstractModel):
             cursor.close()
             return result_accounts
 
-    def update_default_amount(self, account_name: str, amount: int) -> bool:
-        sql = f"UPDATE `accounts` SET `default_amount` = {amount} WHERE `account_name` = {account_name}"
+    def update_default_amount(self, account: Account, amount: int) -> bool:
+        sql = f"UPDATE `accounts` SET `default_amount` = {amount} WHERE `account_name` = {account.name}"
         cursor: sqlite3.Cursor = self.conn.cursor()
 
         result = False
