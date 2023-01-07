@@ -30,7 +30,7 @@ class StatementAbstractModel(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def get(self, year: int, month: int, day: int, account: Account):
+    def get(self, year: int, month: int, day: int, account: Account or None):
         pass
 
     @abc.abstractmethod

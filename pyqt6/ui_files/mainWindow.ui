@@ -83,8 +83,14 @@
     <property name="gridVisible">
      <bool>true</bool>
     </property>
+    <property name="verticalHeaderFormat">
+     <enum>QCalendarWidget::NoVerticalHeader</enum>
+    </property>
+    <property name="navigationBarVisible">
+     <bool>true</bool>
+    </property>
    </widget>
-   <widget class="QFrame" name="_frame_accountButtons">
+   <widget class="QGroupBox" name="_grpBx_accountButtonSelector">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -92,15 +98,6 @@
       <width>410</width>
       <height>350</height>
      </rect>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::Panel</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Plain</enum>
-    </property>
-    <property name="lineWidth">
-     <number>2</number>
     </property>
     <widget class="QPushButton" name="pshBtn_shiire">
      <property name="geometry">
@@ -1023,7 +1020,7 @@
      <enum>Qt::Vertical</enum>
     </property>
    </widget>
-   <zorder>_frame_accountButtons</zorder>
+   <zorder>_grpBx_accountButtonSelector</zorder>
    <zorder>dateEdit_dateInputViewer</zorder>
    <zorder>calenderWidget_calenderViewer</zorder>
    <zorder>tableWidget_statementsViewer</zorder>

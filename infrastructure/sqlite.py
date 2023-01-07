@@ -1,7 +1,7 @@
 import os.path
 import sqlite3
 
-from domain.entities import AccountType, Account, Statement, Shiire
+from domain.entities import AccountType, Account, Statement
 from domain.repositories import (
     AccountTypeAbstractModel,
     AccountAbstractModel,
@@ -76,7 +76,7 @@ class AccountSQLite(SQLiteBase, AccountAbstractModel):
             return result_accounts
 
     def update_default_amount(self, account: Account, amount: int) -> bool:
-        sql = f"UPDATE `accounts` SET `default_amount` = {amount} WHERE `account_name` = {account.name}"
+        sql = f"UPDATE `accounts` SET `default_amount` = {amount} WHERE `account_name` = '{account.name}'"
         cursor: sqlite3.Cursor = self.conn.cursor()
 
         result = False
@@ -109,7 +109,7 @@ class StatementSQLite(SQLiteBase, StatementAbstractModel):
             cursor.close()
             return statements
 
-    def get(self, year: int, month: int, day: int, account: Account = None) -> list[Statement]:
+    def get(self, year: int, month: int, day: int, account: Account or None = None) -> list[Statement]:
         sql = f"SELECT `month`, `day`, `account_id`, `amount`, `created_at` " \
               f"FROM `{year}` " \
               f"WHERE `month` = {month} AND `day` = {day}"
@@ -137,9 +137,9 @@ class StatementSQLite(SQLiteBase, StatementAbstractModel):
         values = []
         for statement in statements:
             values.append(f"({statement.month}, {statement.day}, {statement.account.id}, " +
-                          f"{statement.amount.value}, {statement.created_at.raw_str})")
+                          f"{statement.amount.value}, '{statement.created_at.raw_str}')")
 
-        sql += ", ".join(values)
+        sql += " VALUES " + ", ".join(values)
         cursor = self.conn.cursor()
         result = False
         try:

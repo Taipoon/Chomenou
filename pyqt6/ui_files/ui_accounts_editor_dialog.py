@@ -13,20 +13,6 @@ from PyQt6.QtWidgets import QDialog
 class Ui_AccountsEditorDialog(QDialog):
     def __init__(self):
         super().__init__()
-        self.buttonBox = None
-        self.label_kujoki = None
-        self.lineEdit_karaoke = None
-        self.label_karaoke = None
-        self.lineEdit_chosakuken = None
-        self.label_chosakuken = None
-        self.lineEdit_risueki = None
-        self.label_risueki = None
-        self.lineEdit_kujoki = None
-        self.lineEdit_oshibori = None
-        self.label_oshibori = None
-        self._formLayout = None
-        self._label = None
-        self.verticalLayout = None
         self.setupUi()
 
     def setupUi(self):

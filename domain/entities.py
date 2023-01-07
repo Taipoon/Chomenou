@@ -87,14 +87,14 @@ class Statement(object):
 
     @property
     def account(self) -> Account:
-        if self._account_id == Shiire.id:
-            return Shiire
-        if self._account_id == Settai.id:
-            return Settai
-        if self._account_id == Uriage.id:
-            return Uriage
-        if self._account_id == Oshibori.id:
-            return Oshibori
+        if self._account_id == Accounts.Shiire.id:
+            return Accounts.Shiire
+        if self._account_id == Accounts.Settai.id:
+            return Accounts.Settai
+        if self._account_id == Accounts.Uriage.id:
+            return Accounts.Uriage
+        if self._account_id == Accounts.Oshibori.id:
+            return Accounts.Oshibori
 
     @property
     def amount(self) -> Amount:
@@ -105,11 +105,26 @@ class Statement(object):
         return self._created_at
 
 
-VariableCost = AccountType(1, "変動費")
-FixedCost = AccountType(2, "固定費")
-Sales = AccountType(3, "売上")
+class AccountTypes(object):
+    VariableCost = AccountType(1, "変動費")
+    FixedCost = AccountType(2, "固定費")
+    Sales = AccountType(3, "売上")
 
-Shiire = Account(1, "仕入", VariableCost)
-Settai = Account(2, "接待", VariableCost)
-Uriage = Account(3, "売上", Sales)
-Oshibori = Account(4, "おしぼり", FixedCost, Amount(8800))
+    @classmethod
+    def get_instance_by_name(cls, name: str) -> AccountType:
+        for var_name, instance in cls.__dict__.items():
+            if isinstance(instance, AccountType) and instance.name == name:
+                return instance
+
+
+class Accounts(object):
+    Shiire = Account(1, "仕入", AccountTypes.VariableCost)
+    Settai = Account(2, "接待", AccountTypes.VariableCost)
+    Uriage = Account(3, "売上", AccountTypes.Sales)
+    Oshibori = Account(4, "おしぼり", AccountTypes.FixedCost, Amount(8800))
+
+    @classmethod
+    def get_instance_by_name(cls, name: str) -> Account:
+        for var_name, instance in cls.__dict__.items():
+            if isinstance(instance, Account) and instance.name == name:
+                return instance
