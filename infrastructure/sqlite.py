@@ -110,9 +110,11 @@ class StatementSQLite(SQLiteBase, StatementAbstractModel):
             return statements
 
     def get(self, year: int, month: int, day: int, account: Account or None = None) -> list[Statement]:
-        sql = f"SELECT `month`, `day`, `account_id`, `amount`, `created_at` " \
+        sql = f"SELECT `month`, `day`, `account_id`, " \
+              f"SUM(`amount`) AS `sum_amount`, MAX(`created_at`) AS `updated_at` " \
               f"FROM `{year}` " \
-              f"WHERE `month` = {month} AND `day` = {day}"
+              f"GROUP BY `month`, `day`, `account_id` " \
+              f"HAVING `month` = {month} AND `day` = {day}"
 
         if account:
             sql += f" AND `account_id` = {account.id}"
@@ -131,7 +133,43 @@ class StatementSQLite(SQLiteBase, StatementAbstractModel):
             cursor.close()
             return statements
 
-    def insert(self, year: int, statements: list[Statement]):
+    def get_monthly_account_summary(self, year: int, month: int) -> list[Statement]:
+        sql = f"SELECT `month`, `account_id`, SUM(`amount`), MAX(`created_at`) AS `updated_at` " \
+              f"FROM `{year}` " \
+              f"WHERE `month` = {month} " \
+              f"GROUP BY `account_id` " \
+              f"ORDER BY `account_id`"
+        cursor = self.conn.cursor()
+        statements = []
+        try:
+            cursor.execute(sql)
+            for row in cursor:
+                month, account_id, amount, updated_at = row
+                statements.append(Statement(month=month, day=0,
+                                            account_id=account_id,
+                                            amount=Amount(amount),
+                                            created_at=StatementCreatedAt(updated_at)))
+        finally:
+            cursor.close()
+            return statements
+
+    def get_details_summary_by_accounts(self, year: int, month: int, account_id: int) -> list[Statement]:
+        sql = f"SELECT `day`, `account_id`, SUM(`amount`) AS `sum_amount`, " \
+              f"FROM `2000` " \
+              f"WHERE `month` = {month} AND `account_id` = {account_id} " \
+              f"GROUP BY `day`, `account_id`"
+        cursor = self.conn.cursor()
+        statements = []
+        try:
+            cursor.execute(sql)
+            for row in cursor:
+                day, account_id, amount = row
+                statements.append(Statement(month=month, day=day, account_id=account_id, amount=Amount(amount)))
+        finally:
+            cursor.close()
+            return statements
+
+    def insert(self, year: int, statements: list[Statement]) -> bool:
         sql = f"INSERT INTO `{year}` (`month`, `day`, `account_id`, `amount`, `created_at`)"
 
         values = []

@@ -4,7 +4,7 @@ from datetime import datetime
 from PyQt6 import uic
 from PyQt6.QtCore import QDate, QDateTime
 from PyQt6.QtGui import QIntValidator
-from PyQt6.QtWidgets import QPushButton, QMessageBox
+from PyQt6.QtWidgets import QPushButton, QMessageBox, QTableWidgetItem, QTreeWidgetItem
 
 from domain.entities import Accounts, Account, Statement
 from domain.repositories import StatementAbstractModel
@@ -34,8 +34,8 @@ class MainWindow(Ui_MainWindow):
         self.pshBtn_goToday.clicked.connect(self._date_change_buttons_clicked)
         self.pshBtn_goForwardOneDay.clicked.connect(self._date_change_buttons_clicked)
 
-        # 日付表示欄の変更をカレンダーに連動させる
-        self.dateEdit_dateInputViewer.dateChanged.connect(self.calenderWidget_calenderViewer.setSelectedDate)
+        # 日付表示欄の変更イベントを設定
+        self.dateEdit_dateInputViewer.dateChanged.connect(self._date_edit_date_input_viewer_date_changed)
 
         # カレンダーの日付選択を日付表示欄に連動させる
         self.calenderWidget_calenderViewer.clicked.connect(self.dateEdit_dateInputViewer.setDate)
@@ -43,6 +43,7 @@ class MainWindow(Ui_MainWindow):
 
         # 金額入力欄のバリデーションを設定
         self.lineEdit_amountEntryField.setValidator(QIntValidator())
+        self.lineEdit_amountEntryField.returnPressed.connect(self.pshBtn_executeRegistration.click)
 
         # 勘定科目選択ボタンへの紐づけ
         for element in self.__dict__.values():
@@ -66,6 +67,16 @@ class MainWindow(Ui_MainWindow):
         elif s is self.pshBtn_goForwardOneDay:
             self.dateEdit_dateInputViewer.setDate(selected_date.addDays(1))
 
+    def _date_edit_date_input_viewer_date_changed(self):
+        # カレンダーの表示を変更
+        date = self.dateEdit_dateInputViewer.date()
+        self.calenderWidget_calenderViewer.setSelectedDate(date)
+
+        # 明細テーブルの更新
+        self._presenter.update_table_viewer_action(year=date.year(),
+                                                   month=date.month(),
+                                                   day=date.day())
+
     def _calender_widget_current_page_changed(self, year, month):
         day = self.dateEdit_dateInputViewer.date().day()
         self.dateEdit_dateInputViewer.setDate(QDate(year, month, day))
@@ -86,6 +97,8 @@ class MainWindow(Ui_MainWindow):
                 raise ValueError
         except ValueError:
             QMessageBox.warning(self, "金額エラー", "1以上の整数値を入力してください")
+            self.lineEdit_amountEntryField.clear()
+            self.lineEdit_amountEntryField.setFocus()
             return
 
         statement = Statement(month=date.month(), day=date.day(),
@@ -93,6 +106,9 @@ class MainWindow(Ui_MainWindow):
                               created_at=StatementCreatedAt(datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
 
         self._presenter.registration_action(self.dateEdit_dateInputViewer.date().year(), statement=statement)
+        self._presenter.update_table_viewer_action(date.year(), date.month(), date.day())
+        self.lineEdit_amountEntryField.clear()
+        self.lineEdit_amountEntryField.setFocus()
 
 
 class MainWindowPresenter(object):
@@ -107,10 +123,36 @@ class MainWindowPresenter(object):
 
     def update_table_viewer_action(self, year: int, month: int, day: int):
         # テーブル表示の更新
-        print(self._model.get(year=year, month=month, day=day, account=None))
+        rows = self._model.get(year=year, month=month, day=day, account=None)
+        self._view.tableWidget_statementsViewer.clear()
+        self._view.tableWidget_statementsViewer.setRowCount(len(rows))
+        self._view.tableWidget_statementsViewer.setHorizontalHeaderLabels(["勘定科目", "合計金額"])
 
-    def update_tree_viewer_action(self):
+        for row_index, row in enumerate(rows):
+            self._view.tableWidget_statementsViewer.setItem(row_index, 0,
+                                                            QTableWidgetItem(row.account.name))
+            self._view.tableWidget_statementsViewer.setItem(row_index, 1,
+                                                            QTableWidgetItem(row.amount.comma_value_with_unit))
+        # ツリー表示の更新
+        self.update_tree_viewer_action(year=year, month=month)
+
+    def update_tree_viewer_action(self, year: int, month: int):
         # ツリーサマリの更新
-        pass
+        self._view.treeWidget_monthlySummaryViewer.clear()
+        # 勘定科目ごとの合計金額を取得
+        summary_by_accounts = self._model.get_monthly_account_summary(year=year, month=month)
 
+        for summary in summary_by_accounts:
+            top_level_row = QTreeWidgetItem()
+            top_level_row.setText(0, summary.account.name)
+            top_level_row.setText(1, summary.amount.comma_value_with_unit)
 
+            details_by_accounts = self._model.get_details_summary_by_accounts(year=year,
+                                                                              month=month,
+                                                                              account_id=summary.account.id)
+            for detail in details_by_accounts:
+                detail_row = QTreeWidgetItem(top_level_row)
+                detail_row.setText(0, detail.display_date)
+                detail_row.setText(1, detail.amount.comma_value_with_unit)
+
+            self._view.treeWidget_monthlySummaryViewer.addTopLevelItem(top_level_row)

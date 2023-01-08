@@ -30,11 +30,19 @@ class StatementAbstractModel(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def get(self, year: int, month: int, day: int, account: Account or None):
+    def get(self, year: int, month: int, day: int, account: Account or None) -> list[Statement]:
         pass
 
     @abc.abstractmethod
-    def insert(self, year: int, statements: list[Statement]):
+    def insert(self, year: int, statements: list[Statement]) -> bool:
+        pass
+
+    @abc.abstractmethod
+    def get_monthly_account_summary(self, year: int, month: int) -> list[Statement]:
+        pass
+
+    @abc.abstractmethod
+    def get_details_summary_by_accounts(self, year: int, month: int, account_id: int) -> list[Statement]:
         pass
 
 

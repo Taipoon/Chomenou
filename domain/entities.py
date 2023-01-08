@@ -63,7 +63,7 @@ class Account(object):
 
 
 class Statement(object):
-    def __init__(self, month: int, day: int, account_id: int, amount: Amount, created_at: StatementCreatedAt):
+    def __init__(self, month: int, day: int, account_id: int, amount: Amount, created_at: StatementCreatedAt or None = None):
         self._month = month
         self._day = day
         self._account_id = account_id
@@ -84,6 +84,10 @@ class Statement(object):
     @property
     def day(self) -> int:
         return self._day
+
+    @property
+    def display_date(self) -> str:
+        return f"{self.month}月 {self.day}日"
 
     @property
     def account(self) -> Account:
