@@ -6,9 +6,21 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>472</width>
-    <height>263</height>
+    <width>324</width>
+    <height>278</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>324</width>
+    <height>278</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>324</width>
+    <height>278</height>
+   </size>
   </property>
   <property name="font">
    <font>
@@ -20,79 +32,215 @@
   <property name="windowTitle">
    <string>勘定科目の編集</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
-    <widget class="QLabel" name="_label">
-     <property name="text">
-      <string>固定費として事前入力したい金額を変更できます</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <layout class="QFormLayout" name="_formLayout">
-     <item row="0" column="0">
-      <widget class="QLabel" name="label_oshibori">
-       <property name="text">
-        <string>おしぼり</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLineEdit" name="lineEdit_oshibori"/>
-     </item>
-     <item row="1" column="1">
-      <widget class="QLineEdit" name="lineEdit_kujoki"/>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="label_risueki">
-       <property name="text">
-        <string>リース植木</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="QLineEdit" name="lineEdit_risueki"/>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="label_chosakuken">
-       <property name="text">
-        <string>著作権</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <widget class="QLineEdit" name="lineEdit_chosakuken"/>
-     </item>
-     <item row="4" column="0">
-      <widget class="QLabel" name="label_karaoke">
-       <property name="text">
-        <string>カラオケ</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="1">
-      <widget class="QLineEdit" name="lineEdit_karaoke"/>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_kujoki">
-       <property name="text">
-        <string>駆除器</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Save</set>
-     </property>
-    </widget>
-   </item>
-  </layout>
+  <widget class="QLabel" name="_label">
+   <property name="geometry">
+    <rect>
+     <x>12</x>
+     <y>12</y>
+     <width>286</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>固定費として事前入力したい金額を変更できます</string>
+   </property>
+  </widget>
+  <widget class="QDialogButtonBox" name="buttonBox">
+   <property name="geometry">
+    <rect>
+     <x>6</x>
+     <y>227</y>
+     <width>155</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Save</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_oshibori_2">
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>70</y>
+     <width>52</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>円</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_oshibori_3">
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>100</y>
+     <width>52</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>円</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_oshibori_4">
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>130</y>
+     <width>52</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>円</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_oshibori_5">
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>160</y>
+     <width>52</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>円</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_oshibori_6">
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>190</y>
+     <width>52</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>円</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_chosakuken">
+   <property name="geometry">
+    <rect>
+     <x>90</x>
+     <y>158</y>
+     <width>125</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_karaoke">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>189</y>
+     <width>52</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>カラオケ</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_karaoke">
+   <property name="geometry">
+    <rect>
+     <x>90</x>
+     <y>189</y>
+     <width>125</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_kujoki">
+   <property name="geometry">
+    <rect>
+     <x>43</x>
+     <y>96</y>
+     <width>39</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>駆除器</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_chosakuken">
+   <property name="geometry">
+    <rect>
+     <x>43</x>
+     <y>158</y>
+     <width>39</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>著作権</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_kujoki">
+   <property name="geometry">
+    <rect>
+     <x>90</x>
+     <y>96</y>
+     <width>125</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_risueki">
+   <property name="geometry">
+    <rect>
+     <x>17</x>
+     <y>127</y>
+     <width>65</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>リース植木</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_risueki">
+   <property name="geometry">
+    <rect>
+     <x>90</x>
+     <y>127</y>
+     <width>125</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_oshibori">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>65</y>
+     <width>52</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>おしぼり</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_oshibori">
+   <property name="geometry">
+    <rect>
+     <x>90</x>
+     <y>65</y>
+     <width>125</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections>

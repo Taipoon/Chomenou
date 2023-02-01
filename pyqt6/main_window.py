@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 
 from PyQt6 import uic
-from PyQt6.QtCore import QDate, QDateTime
+from PyQt6.QtCore import QDate, QObject
 from PyQt6.QtGui import QIntValidator
 from PyQt6.QtWidgets import QPushButton, QMessageBox, QTableWidgetItem, QTreeWidgetItem
 
@@ -10,7 +10,9 @@ from domain.entities import Accounts, Account, Statement
 from domain.repositories import StatementAbstractModel
 from domain.valueobjects import Amount, StatementCreatedAt
 from infrastructure.sqlite import StatementSQLite
+from pyqt6.accounts_editor_dialog import AccountsEditorDialog
 from pyqt6.ui_files.ui_main_window import Ui_MainWindow
+from pyqt6.bulk_insertion_dialog import BulkInsertionDialog
 
 
 class MainWindow(Ui_MainWindow):
@@ -24,12 +26,14 @@ class MainWindow(Ui_MainWindow):
         self._initialize_connect_signal()
         # 選択中の選択科目
         self._selected_account: Account = Accounts.get_instance_by_name("仕入")
+        # Window title
+        self.setWindowTitle("New Taipoon")
 
     def _initialize_connect_signal(self):
         # 現在日時に設定
         self.dateEdit_dateInputViewer.setDate(QDate.currentDate())
 
-        # 日付変更ボタン
+        # 日付変更ボタンのイベントを設定
         self.pshBtn_goBackOneDay.clicked.connect(self._date_change_buttons_clicked)
         self.pshBtn_goToday.clicked.connect(self._date_change_buttons_clicked)
         self.pshBtn_goForwardOneDay.clicked.connect(self._date_change_buttons_clicked)
@@ -37,7 +41,7 @@ class MainWindow(Ui_MainWindow):
         # 日付表示欄の変更イベントを設定
         self.dateEdit_dateInputViewer.dateChanged.connect(self._date_edit_date_input_viewer_date_changed)
 
-        # カレンダーの日付選択を日付表示欄に連動させる
+        # カレンダーの日付選択イベントを日付表示欄に連動させる
         self.calenderWidget_calenderViewer.clicked.connect(self.dateEdit_dateInputViewer.setDate)
         self.calenderWidget_calenderViewer.currentPageChanged.connect(self._calender_widget_current_page_changed)
 
@@ -57,7 +61,19 @@ class MainWindow(Ui_MainWindow):
         # 記帳ボタンのアクションを設定
         self.pshBtn_executeRegistration.clicked.connect(self._execute_registration_clicked)
 
+        # メニューバーのアクション設定
+        # ファイル
+        self.menu_file.triggered.connect(self._menu_file_triggered)
+        # 編集
+        self.menu_edit.triggered.connect(self._menu_edit_triggered)
+        # ツール
+        self.menu_tools.triggered.connect(self._menu_tools_triggered)
+
     def _date_change_buttons_clicked(self):
+        """
+        「1日進む」、「1日戻る」、「今日へ移動」のボタンを押すと日付入力欄を更新する。
+        :return: None
+        """
         s = self.sender()
         selected_date = self.dateEdit_dateInputViewer.date()
         if s is self.pshBtn_goBackOneDay:
@@ -68,6 +84,11 @@ class MainWindow(Ui_MainWindow):
             self.dateEdit_dateInputViewer.setDate(selected_date.addDays(1))
 
     def _date_edit_date_input_viewer_date_changed(self):
+        """
+        日付入力欄の更新を検知すると呼び出される。
+        カレンダーの選択状態を、更新後の日付と同期する。
+        :return: None
+        """
         # カレンダーの表示を変更
         date = self.dateEdit_dateInputViewer.date()
         self.calenderWidget_calenderViewer.setSelectedDate(date)
@@ -78,16 +99,29 @@ class MainWindow(Ui_MainWindow):
                                                    day=date.day())
 
     def _calender_widget_current_page_changed(self, year, month):
+        """
+        カレンダーの表示月を変更すると検知すると呼び出される。
+        ページ遷移先の日付は、ページ遷移前に最後に選択していた日を選択する。
+        :param year: int
+        :param month: int
+        :return: None
+        """
+        # 遷移前に選択していた日を取得
         day = self.dateEdit_dateInputViewer.date().day()
+        # 日付入力欄の表示を変更
         self.dateEdit_dateInputViewer.setDate(QDate(year, month, day))
 
     def _account_button_clicked(self):
-        s = self.sender()
+        s: QObject = self.sender()
         instance = Accounts.get_instance_by_name(s.text())
         if instance is None:
             QMessageBox.warning(self, "勘定科目エラー", "システムで扱えない勘定科目である可能性があります")
             return
         self._selected_account = instance
+
+        # 初期値がある場合は設定
+        if instance.default_amount.value != 0:
+            self.lineEdit_amountEntryField.setText(str(instance.default_amount.value))
 
     def _execute_registration_clicked(self):
         date = self.dateEdit_dateInputViewer.date()
@@ -109,6 +143,28 @@ class MainWindow(Ui_MainWindow):
         self._presenter.update_table_viewer_action(date.year(), date.month(), date.day())
         self.lineEdit_amountEntryField.clear()
         self.lineEdit_amountEntryField.setFocus()
+
+    def _menu_file_triggered(self, action):
+        pass
+
+    def _menu_edit_triggered(self, action):
+        if action is self.action_bulkInsertion:
+            open_bulk_insertion_dialog()
+        elif action is self.action_editAccounts:
+            open_accounts_editor_dialog()
+
+    def _menu_tools_triggered(self, action):
+        pass
+
+
+def open_bulk_insertion_dialog():
+    d = BulkInsertionDialog()
+    d.exec()
+
+
+def open_accounts_editor_dialog():
+    d = AccountsEditorDialog()
+    d.exec()
 
 
 class MainWindowPresenter(object):
