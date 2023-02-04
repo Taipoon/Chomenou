@@ -64,7 +64,7 @@ class StatementAbstractModel(abc.ABC):
         0件の場合は空の明細リストを返します。
         :param year: 年
         :param month: 月
-        :return: 勘定科目ごとの合計金額を求めた明細
+        :return: 明細
         """
         pass
 
@@ -75,6 +75,6 @@ class StatementAbstractModel(abc.ABC):
         :param year: 年
         :param month: 月
         :param account: 勘定科目
-        :return: None
+        :return: 明細
         """
         pass

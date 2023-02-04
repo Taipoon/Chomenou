@@ -1,6 +1,6 @@
 import abc
 
-from domain.entities import Statement, Account
+from domain.entities import Statement, Account, MonthlyAccountSummary
 
 
 class AbstractBaseView(abc.ABC):
@@ -56,17 +56,18 @@ class MainView(AbstractBaseView):
     @abc.abstractmethod
     def update_daily_summary_viewer(self, statements: list[Statement]):
         """
-        明細表データを表示します
-        :param statements: 明細票
-        :return: None
+        日ごとのサマリを表示します
+        :param statements: 明細
+        :return:
         """
         pass
 
     @abc.abstractmethod
-    def update_monthly_summary_viewer(self, summary: dict[Account: list[Statement]]):
+    def update_monthly_summary_viewer(self, summary: list[MonthlyAccountSummary]):
         """
-        月ごとの明細表データのサマリを表示します
-        :return: None
+        月ごとのサマリを表示します
+        :param summary:
+        :return:
         """
         pass
 

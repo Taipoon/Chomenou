@@ -1,11 +1,10 @@
 from PyQt6.QtCore import QDate
-from PyQt6.QtGui import QIntValidator
+from PyQt6.QtGui import QIntValidator, QIcon, QPixmap
 from PyQt6.QtWidgets import QTableWidgetItem, QTreeWidgetItem, QErrorMessage
 
 from domain.entities import Account, Statement, Accounts
 from domain.exceptions import InvalidAmountException
-from domain.presenters.main_window_presenter import MainWindowPresenter
-from domain.views import MainView
+from domain.presenters.main_window_presenter import MainWindowPresenter, MonthlyAccountSummary
 from pyqt6.ui_files.ui_main_window import Ui_MainWindow
 
 
@@ -15,6 +14,9 @@ class MainWindow(Ui_MainWindow):
         self._presenter = MainWindowPresenter(self, model)
 
     def initialize_ui(self):
+        # ウィンドウアイコンを設定
+        self.setWindowIcon(QIcon("icon.png"))
+
         # 現在日時に設定
         self.dateEdit_dateInputViewer.setDate(QDate.currentDate())
 
@@ -102,7 +104,7 @@ class MainWindow(Ui_MainWindow):
     def _calender_clicked(self):
         """
         クリックされた日付に移動し、日付表示欄を更新します。
-        :return:
+        :return: None
         """
         date = self.calenderWidget_calenderViewer.selectedDate()
         y, m, d = date.year(), date.month(), date.day()
@@ -135,6 +137,10 @@ class MainWindow(Ui_MainWindow):
             self.show_error_popup()
 
     def _account_buttons_clicked(self):
+        """
+        選択中の勘定科目を切り替えます
+        :return: None
+        """
         s = self.sender()
         a = Accounts.get_instance_by_name(s.text())
         self._presenter.change_selected_account(a)
@@ -173,22 +179,23 @@ class MainWindow(Ui_MainWindow):
             self.tableWidget_dailySummaryViewer.setItem(row, 0, QTableWidgetItem(statement.account.name))
             self.tableWidget_dailySummaryViewer.setItem(row, 1, QTableWidgetItem(statement.amount.comma_value_with_unit))
 
-    def update_monthly_summary_viewer(self, summary: dict[Account: list[Statement]]):
+    def update_monthly_summary_viewer(self, summary: list[MonthlyAccountSummary]):
         """毎月の勘定科目ごとの日別合計金額を表示します"""
         self.treeWidget_monthlySummaryViewer.clear()
+        for s in summary:
+            top_level_item = QTreeWidgetItem()
+            top_level_item.setText(0, s.account.name)
+            top_level_item.setText(1, s.total_amount.comma_value_with_unit)
 
-        account = summary.account
+            for detail in s.details:
+                item = QTreeWidgetItem()
+                item.setText(0, detail.display_date)
+                item.setText(1, detail.amount.comma_value_with_unit)
 
-        top_level_item = QTreeWidgetItem()
-        top_level_item.setText(0, account.name)
-
-        for statement in summary.statements:
-            item = QTreeWidgetItem()
-            item.setText(0, statement.display_date)
-            item.setText(1, statement.amount.comma_value_with_unit)
-            top_level_item.addChild(item)
+                top_level_item.addChild(item)
 
             self.treeWidget_monthlySummaryViewer.addTopLevelItem(top_level_item)
+        self.treeWidget_monthlySummaryViewer.expandAll()
 
     @staticmethod
     def show_error_popup():
