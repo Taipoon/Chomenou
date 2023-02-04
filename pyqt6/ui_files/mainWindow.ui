@@ -33,6 +33,9 @@
   </property>
   <widget class="QWidget" name="_widget_centralWidget">
    <widget class="QDateEdit" name="dateEdit_dateInputViewer">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -681,7 +684,7 @@
      </property>
     </widget>
    </widget>
-   <widget class="QTableWidget" name="tableWidget_statementsViewer">
+   <widget class="QTableWidget" name="tableWidget_dailySummaryViewer">
     <property name="geometry">
      <rect>
       <x>440</x>
@@ -944,9 +947,9 @@
    <widget class="QLineEdit" name="lineEdit_amountEntryField">
     <property name="geometry">
      <rect>
-      <x>30</x>
+      <x>100</x>
       <y>330</y>
-      <width>251</width>
+      <width>181</width>
       <height>31</height>
      </rect>
     </property>
@@ -1026,10 +1029,26 @@
      <enum>Qt::Vertical</enum>
     </property>
    </widget>
+   <widget class="QLabel" name="label_selectedAccount">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>325</y>
+      <width>81</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>---</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
    <zorder>_grpBx_accountButtonSelector</zorder>
    <zorder>dateEdit_dateInputViewer</zorder>
    <zorder>calenderWidget_calenderViewer</zorder>
-   <zorder>tableWidget_statementsViewer</zorder>
+   <zorder>tableWidget_dailySummaryViewer</zorder>
    <zorder>treeWidget_monthlySummaryViewer</zorder>
    <zorder>pshBtn_showHistory</zorder>
    <zorder>pshBtn_goBackOneDay</zorder>
@@ -1039,6 +1058,7 @@
    <zorder>label_yen</zorder>
    <zorder>pshBtn_executeRegistration</zorder>
    <zorder>_line_verticalSeparater</zorder>
+   <zorder>label_selectedAccount</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
