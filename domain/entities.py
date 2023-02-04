@@ -46,7 +46,7 @@ class Account(object):
         return self._account_name
 
     def __hash__(self):
-        return hash(f"{self.id}:{self.name}:{self.type}")
+        return hash(f"{self._account_id}:{self._account_name}:{self._account_type}")
 
     @property
     def id(self) -> int:
@@ -66,7 +66,9 @@ class Account(object):
 
 
 class Statement(object):
-    def __init__(self, month: int, day: int, account_id: int, amount: Amount, created_at: StatementCreatedAt or None = None):
+    def __init__(self, year: int, month: int, day: int, account_id: int,
+                 amount: Amount, created_at: StatementCreatedAt or None = None):
+        self._year = year
         self._month = month
         self._day = day
         self._account_id = account_id
@@ -75,10 +77,14 @@ class Statement(object):
 
     def __str__(self):
         s = f"""\
-{self.account.name}:{self.month}月{self.day}日[{self.account.type.name}]({self._account_id}): \
-{self.amount.value}円 @ {self.created_at.standard_format}     
+{self.account.name}[{self.account.type.name}({self._account_id})]: 
+{self._year}年{self._month}月{self._day}日:{self.amount.value}円
 """
         return s
+
+    @property
+    def year(self) -> int:
+        return self._year
 
     @property
     def month(self) -> int:
@@ -93,22 +99,21 @@ class Statement(object):
         return f"{self.month}月 {self.day}日"
 
     @property
+    def account_id(self) -> int:
+        return self._account_id
+
+    @property
     def account(self) -> Account:
-        if self._account_id == Accounts.Shiire.id:
-            return Accounts.Shiire
-        if self._account_id == Accounts.Settai.id:
-            return Accounts.Settai
-        if self._account_id == Accounts.Uriage.id:
-            return Accounts.Uriage
-        if self._account_id == Accounts.Oshibori.id:
-            return Accounts.Oshibori
+        return Accounts.get_instance_by_id(self._account_id)
 
     @property
     def amount(self) -> Amount:
         return self._amount
 
     @property
-    def created_at(self) -> StatementCreatedAt:
+    def created_at(self) -> StatementCreatedAt or None:
+        if self._created_at is None:
+            return None
         return self._created_at
 
 
@@ -149,16 +154,22 @@ class Accounts(object):
     Uriage = Account(20, "売上", AccountTypes.Sales)
 
     @classmethod
+    def get_instance_by_id(cls, id: int) -> Account:
+        for _, instance in cls.__dict__.items():
+            if isinstance(instance, Account) and instance.id == id:
+                return instance
+
+    @classmethod
     def get_instance_by_name(cls, name: str) -> Account:
-        for var_name, instance in cls.__dict__.items():
+        for _, instance in cls.__dict__.items():
             if isinstance(instance, Account) and instance.name == name:
                 return instance
 
     @classmethod
     def get_instance_by_hepburn(cls, hepburn: str) -> Account:
         print(cls.__dict__)
-        for name, obj in cls.__dict__.items():
-            if not isinstance(obj, Account):
+        for name, instance in cls.__dict__.items():
+            if not isinstance(instance, Account):
                 continue
             if hepburn == name.lower():
-                return obj
+                return instance

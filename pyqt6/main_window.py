@@ -1,65 +1,66 @@
-import os
-from datetime import datetime
-
-from PyQt6 import uic
-from PyQt6.QtCore import QDate, QObject
+from PyQt6.QtCore import QDate
 from PyQt6.QtGui import QIntValidator
-from PyQt6.QtWidgets import QPushButton, QMessageBox, QTableWidgetItem, QTreeWidgetItem
+from PyQt6.QtWidgets import QTableWidgetItem, QTreeWidgetItem, QErrorMessage
 
-from domain.entities import Accounts, Account, Statement
-from domain.repositories import StatementAbstractModel
-from domain.valueobjects import Amount, StatementCreatedAt
-from infrastructure.sqlite import StatementSQLite
-from pyqt6.accounts_editor_dialog import AccountsEditorDialog
+from domain.entities import Account, Statement, Accounts
+from domain.exceptions import InvalidAmountException
+from domain.presenters.main_window_presenter import MainWindowPresenter
+from domain.views import MainView
 from pyqt6.ui_files.ui_main_window import Ui_MainWindow
-from pyqt6.bulk_insertion_dialog import BulkInsertionDialog
 
 
 class MainWindow(Ui_MainWindow):
-    def __init__(self) -> None:
+    def __init__(self, model):
         super().__init__()
-        self._presenter = MainWindowPresenter(self, StatementSQLite())
+        self._presenter = MainWindowPresenter(self, model)
 
-        if os.environ.get("UI_DEBUG"):
-            uic.loadUi(os.path.join(os.path.dirname(__file__), "ui_files", "mainWindow.ui"), self)
-
-        self._initialize_connect_signal()
-        # 選択中の選択科目
-        self._selected_account: Account = Accounts.get_instance_by_name("仕入")
-        # Window title
-        self.setWindowTitle("New Taipoon")
-
-    def _initialize_connect_signal(self):
+    def initialize_ui(self):
         # 現在日時に設定
         self.dateEdit_dateInputViewer.setDate(QDate.currentDate())
+
+        # 日付表示欄の変更イベントを設定
+        self.dateEdit_dateInputViewer.dateChanged.connect(self._date_input_viewer_changed)
+
+        # 選択中の勘定科目を「仕入」に設定
+        self.label_selectedAccount.setText(Accounts.Shiire.name)
 
         # 日付変更ボタンのイベントを設定
         self.pshBtn_goBackOneDay.clicked.connect(self._date_change_buttons_clicked)
         self.pshBtn_goToday.clicked.connect(self._date_change_buttons_clicked)
         self.pshBtn_goForwardOneDay.clicked.connect(self._date_change_buttons_clicked)
 
-        # 日付表示欄の変更イベントを設定
-        self.dateEdit_dateInputViewer.dateChanged.connect(self._date_edit_date_input_viewer_date_changed)
-
-        # カレンダーの日付選択イベントを日付表示欄に連動させる
-        self.calenderWidget_calenderViewer.clicked.connect(self.dateEdit_dateInputViewer.setDate)
-        self.calenderWidget_calenderViewer.currentPageChanged.connect(self._calender_widget_current_page_changed)
+        # カレンダーのクリックイベントを設定
+        self.calenderWidget_calenderViewer.clicked.connect(self._calender_clicked)
+        self.calenderWidget_calenderViewer.currentPageChanged.connect(self._calender_page_changed)
 
         # 金額入力欄のバリデーションを設定
         self.lineEdit_amountEntryField.setValidator(QIntValidator())
-        self.lineEdit_amountEntryField.returnPressed.connect(self.pshBtn_executeRegistration.click)
+        self.lineEdit_amountEntryField.returnPressed.connect(self._execute_registration)
 
-        # 勘定科目選択ボタンへの紐づけ
-        for element in self.__dict__.values():
-            if not isinstance(element, QPushButton):
-                continue
-            if element in [self.pshBtn_executeRegistration, self.pshBtn_goBackOneDay,
-                           self.pshBtn_goToday, self.pshBtn_goForwardOneDay, self.pshBtn_showHistory]:
-                continue
-            element.clicked.connect(self._account_button_clicked)
+        # 記帳ボタンのクリックイベントを設定
+        self.pshBtn_executeRegistration.clicked.connect(self._execute_registration)
 
-        # 記帳ボタンのアクションを設定
-        self.pshBtn_executeRegistration.clicked.connect(self._execute_registration_clicked)
+        # 勘定科目ボタンのクリックイベント設定
+        self.pshBtn_aisu.clicked.connect(self._account_buttons_clicked)
+        self.pshBtn_bihin.clicked.connect(self._account_buttons_clicked)
+        self.pshBtn_chosakuken.clicked.connect(self._account_buttons_clicked)
+        self.pshBtn_hoken.clicked.connect(self._account_buttons_clicked)
+        self.pshBtn_jidoshazei.clicked.connect(self._account_buttons_clicked)
+        self.pshBtn_karaoke.clicked.connect(self._account_buttons_clicked)
+        self.pshBtn_kokokuhi.clicked.connect(self._account_buttons_clicked)
+        self.pshBtn_kujoki.clicked.connect(self._account_buttons_clicked)
+        self.pshBtn_osakagas.clicked.connect(self._account_buttons_clicked)
+        self.pshBtn_oshibori.clicked.connect(self._account_buttons_clicked)
+        self.pshBtn_risueki.clicked.connect(self._account_buttons_clicked)
+        self.pshBtn_sakadai.clicked.connect(self._account_buttons_clicked)
+        self.pshBtn_settai.clicked.connect(self._account_buttons_clicked)
+        self.pshBtn_shiire.clicked.connect(self._account_buttons_clicked)
+        self.pshBtn_shomohin.clicked.connect(self._account_buttons_clicked)
+        self.pshBtn_shuzenhi.clicked.connect(self._account_buttons_clicked)
+        self.pshBtn_tsushinhi.clicked.connect(self._account_buttons_clicked)
+        self.pshBtn_uriage.clicked.connect(self._account_buttons_clicked)
+        self.pshBtn_yachin.clicked.connect(self._account_buttons_clicked)
+        self.pshBtn_zappi.clicked.connect(self._account_buttons_clicked)
 
         # メニューバーのアクション設定
         # ファイル
@@ -71,144 +72,125 @@ class MainWindow(Ui_MainWindow):
 
     def _date_change_buttons_clicked(self):
         """
-        「1日進む」、「1日戻る」、「今日へ移動」のボタンを押すと日付入力欄を更新する。
+        「1日戻る」「今日へ移動」「1日進む」ボタンの押下を検知し、日付入力欄とカレンダーを変更します。
         :return: None
         """
         s = self.sender()
-        selected_date = self.dateEdit_dateInputViewer.date()
+        current_date = self.dateEdit_dateInputViewer.date()
+
         if s is self.pshBtn_goBackOneDay:
-            self.dateEdit_dateInputViewer.setDate(selected_date.addDays(-1))
+            d = current_date.addDays(-1)
+            self._presenter.update_selected_date(d.year(), d.month(), d.day())
+
         elif s is self.pshBtn_goToday:
-            self.dateEdit_dateInputViewer.setDate(QDate.currentDate())
+            today = QDate.currentDate()
+            self._presenter.update_selected_date(today.year(), today.month(), today.day())
+
         elif s is self.pshBtn_goForwardOneDay:
-            self.dateEdit_dateInputViewer.setDate(selected_date.addDays(1))
+            d = current_date.addDays(1)
+            self._presenter.update_selected_date(d.year(), d.month(), d.day())
 
-    def _date_edit_date_input_viewer_date_changed(self):
+    def _date_input_viewer_changed(self):
         """
-        日付入力欄の更新を検知すると呼び出される。
-        カレンダーの選択状態を、更新後の日付と同期する。
+        日付入力欄の変更を検知し、カレンダーの選択日付を更新します。
         :return: None
         """
-        # カレンダーの表示を変更
         date = self.dateEdit_dateInputViewer.date()
-        self.calenderWidget_calenderViewer.setSelectedDate(date)
+        y, m, d = date.year(), date.month(), date.day()
+        self._presenter.update_selected_date(y, m, d)
 
-        # 明細テーブルの更新
-        self._presenter.update_table_viewer_action(year=date.year(),
-                                                   month=date.month(),
-                                                   day=date.day())
-
-    def _calender_widget_current_page_changed(self, year, month):
+    def _calender_clicked(self):
         """
-        カレンダーの表示月を変更すると検知すると呼び出される。
-        ページ遷移先の日付は、ページ遷移前に最後に選択していた日を選択する。
-        :param year: int
-        :param month: int
+        クリックされた日付に移動し、日付表示欄を更新します。
+        :return:
+        """
+        date = self.calenderWidget_calenderViewer.selectedDate()
+        y, m, d = date.year(), date.month(), date.day()
+        self._presenter.update_selected_date(y, m, d)
+
+    def _calender_page_changed(self, y: int, m: int):
+        """
+        カレンダーのページを変更すると、移動する直前に選択されていた日を保持した上で、
+        移動先の年・月に移動します。同時に日付表示欄を更新します。
+        :param y: 年
+        :param m: 月
         :return: None
         """
-        # 遷移前に選択していた日を取得
-        day = self.dateEdit_dateInputViewer.date().day()
-        # 日付入力欄の表示を変更
-        self.dateEdit_dateInputViewer.setDate(QDate(year, month, day))
+        d = self.calenderWidget_calenderViewer.selectedDate().day()
+        self._presenter.update_selected_date(y, m, d)
 
-    def _account_button_clicked(self):
-        s: QObject = self.sender()
-        instance = Accounts.get_instance_by_name(s.text())
-        if instance is None:
-            QMessageBox.warning(self, "勘定科目エラー", "システムで扱えない勘定科目である可能性があります")
-            return
-        self._selected_account = instance
-
-        # 初期値がある場合は設定
-        if instance.default_amount.value != 0:
-            self.lineEdit_amountEntryField.setText(str(instance.default_amount.value))
-
-    def _execute_registration_clicked(self):
+    def _execute_registration(self):
+        """
+        記帳します
+        :return: None
+        """
         date = self.dateEdit_dateInputViewer.date()
+        y, m, d = date.year(), date.month(), date.day()
+        text = self.lineEdit_amountEntryField.text()
+        selected_account_name = self.label_selectedAccount.text()
+        i = Accounts.get_instance_by_name(selected_account_name)
         try:
-            amount = int(self.lineEdit_amountEntryField.text().replace(",", ""))
-            if amount < 1:
-                raise ValueError
-        except ValueError:
-            QMessageBox.warning(self, "金額エラー", "1以上の整数値を入力してください")
-            self.lineEdit_amountEntryField.clear()
-            self.lineEdit_amountEntryField.setFocus()
-            return
+            self._presenter.execute_registration(y, m, d, text, i)
+        except InvalidAmountException:
+            self.show_error_popup()
 
-        statement = Statement(month=date.month(), day=date.day(),
-                              account_id=self._selected_account.id, amount=Amount(amount),
-                              created_at=StatementCreatedAt(datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+    def _account_buttons_clicked(self):
+        s = self.sender()
+        a = Accounts.get_instance_by_name(s.text())
+        self._presenter.change_selected_account(a)
 
-        self._presenter.registration_action(self.dateEdit_dateInputViewer.date().year(), statement=statement)
-        self._presenter.update_table_viewer_action(date.year(), date.month(), date.day())
+    def _menu_file_triggered(self):
+        pass
+
+    def _menu_edit_triggered(self):
+        pass
+
+    def _menu_tools_triggered(self):
+        pass
+
+    def update_selected_account(self, account: Account):
+        """現在選択されている勘定科目を表示します"""
+        self.label_selectedAccount.setText(account.name)
+
+    def update_date_input_viewer(self, y: int, m: int, d: int):
+        """日付表示欄を更新します"""
+        self.dateEdit_dateInputViewer.setDate(QDate(y, m, d))
+
+    def update_calender_viewer(self, y: int, m: int, d: int):
+        """カレンダーで選択されている日付を更新します"""
+        self.calenderWidget_calenderViewer.setSelectedDate(QDate(y, m, d))
+
+    def clear_amount_entry_field(self):
+        """金額入力欄をリセットします"""
         self.lineEdit_amountEntryField.clear()
-        self.lineEdit_amountEntryField.setFocus()
 
-    def _menu_file_triggered(self, action):
-        pass
+    def update_daily_summary_viewer(self, statements: list[Statement]):
+        """明細テーブルを更新します"""
+        self.tableWidget_dailySummaryViewer.clear()
+        self.tableWidget_dailySummaryViewer.setHorizontalHeaderLabels(["勘定科目", "合計金額"])
+        self.tableWidget_dailySummaryViewer.setRowCount(len(statements))
+        for row, statement in enumerate(statements):
+            self.tableWidget_dailySummaryViewer.setItem(row, 0, QTableWidgetItem(statement.account.name))
+            self.tableWidget_dailySummaryViewer.setItem(row, 1, QTableWidgetItem(statement.amount.comma_value_with_unit))
 
-    def _menu_edit_triggered(self, action):
-        if action is self.action_bulkInsertion:
-            open_bulk_insertion_dialog()
-        elif action is self.action_editAccounts:
-            open_accounts_editor_dialog()
+    def update_monthly_summary_viewer(self, summary: dict[Account: list[Statement]]):
+        """毎月の勘定科目ごとの日別合計金額を表示します"""
+        self.treeWidget_monthlySummaryViewer.clear()
 
-    def _menu_tools_triggered(self, action):
-        pass
+        account = summary.account
 
+        top_level_item = QTreeWidgetItem()
+        top_level_item.setText(0, account.name)
 
-def open_bulk_insertion_dialog():
-    d = BulkInsertionDialog()
-    d.exec()
+        for statement in summary.statements:
+            item = QTreeWidgetItem()
+            item.setText(0, statement.display_date)
+            item.setText(1, statement.amount.comma_value_with_unit)
+            top_level_item.addChild(item)
 
+            self.treeWidget_monthlySummaryViewer.addTopLevelItem(top_level_item)
 
-def open_accounts_editor_dialog():
-    d = AccountsEditorDialog()
-    d.exec()
-
-
-class MainWindowPresenter(object):
-    def __init__(self, view: MainWindow, model: StatementAbstractModel) -> None:
-        self._view = view
-        self._model = model
-
-    def registration_action(self, year: int, statement: Statement):
-        print(year, statement)
-        print(self._model.insert(year=year, statements=[statement]))
-        pass
-
-    def update_table_viewer_action(self, year: int, month: int, day: int):
-        # テーブル表示の更新
-        rows = self._model.get(year=year, month=month, day=day, account=None)
-        self._view.tableWidget_statementsViewer.clear()
-        self._view.tableWidget_statementsViewer.setRowCount(len(rows))
-        self._view.tableWidget_statementsViewer.setHorizontalHeaderLabels(["勘定科目", "合計金額"])
-
-        for row_index, row in enumerate(rows):
-            self._view.tableWidget_statementsViewer.setItem(row_index, 0,
-                                                            QTableWidgetItem(row.account.name))
-            self._view.tableWidget_statementsViewer.setItem(row_index, 1,
-                                                            QTableWidgetItem(row.amount.comma_value_with_unit))
-        # ツリー表示の更新
-        self.update_tree_viewer_action(year=year, month=month)
-
-    def update_tree_viewer_action(self, year: int, month: int):
-        # ツリーサマリの更新
-        self._view.treeWidget_monthlySummaryViewer.clear()
-        # 勘定科目ごとの合計金額を取得
-        summary_by_accounts = self._model.get_monthly_account_summary(year=year, month=month)
-
-        for summary in summary_by_accounts:
-            top_level_row = QTreeWidgetItem()
-            top_level_row.setText(0, summary.account.name)
-            top_level_row.setText(1, summary.amount.comma_value_with_unit)
-
-            details_by_accounts = self._model.get_details_summary_by_accounts(year=year,
-                                                                              month=month,
-                                                                              account_id=summary.account.id)
-            for detail in details_by_accounts:
-                detail_row = QTreeWidgetItem(top_level_row)
-                detail_row.setText(0, detail.display_date)
-                detail_row.setText(1, detail.amount.comma_value_with_unit)
-
-            self._view.treeWidget_monthlySummaryViewer.addTopLevelItem(top_level_row)
+    @staticmethod
+    def show_error_popup():
+        dialog = QErrorMessage()
+        dialog.show()
