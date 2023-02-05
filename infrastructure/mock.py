@@ -1,8 +1,8 @@
 import datetime
 import random
 
-from domain.entities import Account, Statement
-from domain.repositories import StatementAbstractModel
+from domain.entities import Account, Statement, AccountType
+from domain.repositories import StatementAbstractModel, AccountAbstractModel, AccountTypeAbstractModel
 from domain.valueobjects import Amount, StatementCreatedAt
 
 
@@ -58,3 +58,54 @@ class StatementMock(StatementAbstractModel):
     def get_details_summary_by_accounts(self, year: int, month: int, account: Account) -> list[Statement]:
         s = [s for s in self._statements if s.account_id == account.id and s.year == year and s.month == month]
         return s
+
+
+class AccountTypeMock(AccountTypeAbstractModel):
+    def __init__(self):
+        self._account_type: list[AccountType] = []
+        self._setup()
+
+    def _setup(self):
+        self._account_type = [
+            AccountType(type_id=1, type_name="変動費", type_name_hepburn="hendohi"),
+            AccountType(type_id=2, type_name="固定費", type_name_hepburn="koteihi"),
+            AccountType(type_id=3, type_name="売上", type_name_hepburn="uriage"),
+        ]
+
+    def all(self) -> list[AccountType]:
+        return self._account_type
+
+
+class AccountMock(AccountAbstractModel):
+    def __init__(self):
+        self._accounts: list[Account] = []
+        self._setup()
+
+    def _setup(self):
+        hendohi = AccountType(1, "変動費", "hendohi")
+        koteihi = AccountType(2, "固定費", "koteihi")
+        uriage = AccountType(3, "売上", "uriage")
+        self._accounts = [
+            # 変動費
+            Account(1, "仕入", "shiire", hendohi, 0),
+            Account(2, "接待", "settai", hendohi, 0),
+            Account(3, "雑費", "zappi", hendohi, 0),
+            Account(4, "消耗品", "shomohin", hendohi, 0),
+            Account(5, "家賃", "yachin", hendohi, 0),
+            # 固定費
+            Account(6, "おしぼり", "oshibori", koteihi, 8800),
+            Account(7, "駆除機", "kujoki", koteihi, 2000),
+            Account(8, "リース植木", "risueki", koteihi, 14000),
+            # 売上
+            Account(9, "売上", "uriage", uriage, 0)
+        ]
+        return self._accounts
+
+    def all(self) -> list[Account]:
+        return self._accounts
+
+    def update_account(self, account_id: int, account: Account):
+        for i, a in enumerate(self._accounts):
+            if a.id == account_id:
+                self._accounts[i] = account
+                return
