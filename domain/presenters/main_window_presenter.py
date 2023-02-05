@@ -3,12 +3,17 @@ import datetime
 from domain.entities import Statement, Account, MonthlyAccountSummary
 from domain.exceptions import InvalidAmountException
 from domain.repositories import StatementAbstractModel
+from domain.staticvalues import AccountTypes, Accounts
 from domain.valueobjects import Amount, StatementCreatedAt
 from domain.views import MainView
 
 
 class MainWindowPresenter(object):
-    def __init__(self, view: MainView, model: StatementAbstractModel):
+    def __init__(self, view: MainView, model: StatementAbstractModel,
+                 accounts: Accounts, account_types: AccountTypes):
+        self._accounts = accounts
+        self._account_types = account_types
+
         self._view = view
         self._model = model
         self._view.initialize_ui()
@@ -32,9 +37,10 @@ class MainWindowPresenter(object):
         # サマリビューの更新
         self._update_summary_viewer(year, month, day)
 
-    def change_selected_account(self, account: Account):
+    def change_selected_account(self, account_name: str):
         """現在選択中の勘定科目を更新します"""
-        self._view.update_selected_account(account)
+        selected_account = self._accounts.get_account_by_name(account_name)
+        self._view.update_selected_account(selected_account)
 
     def execute_registration(self, year: int, month: int, day: int, input_text: str, account: Account):
         """記帳を行います"""
@@ -72,9 +78,12 @@ class MainWindowPresenter(object):
 
         statements = self._model.get_monthly_account_summary(year=year, month=month)
         for statement in statements:
-            details = self._model.get_details_summary_by_accounts(year, month, statement.account)
+            account = self._accounts.get_account_by_id(statement.account_id)
+            if account is None:
+                continue
+            details = self._model.get_details_summary_by_accounts(year, month, account)
 
-            summary = MonthlyAccountSummary(account=statement.account,
+            summary = MonthlyAccountSummary(account=account,
                                             total_amount=statement.amount,
                                             details=details)
             summary_results.append(summary)

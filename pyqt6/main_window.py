@@ -1,17 +1,30 @@
 from PyQt6.QtCore import QDate
-from PyQt6.QtGui import QIntValidator, QIcon, QPixmap
-from PyQt6.QtWidgets import QTableWidgetItem, QTreeWidgetItem, QErrorMessage
+from PyQt6.QtGui import QIntValidator, QIcon, QAction
+from PyQt6.QtWidgets import QTableWidgetItem, QTreeWidgetItem, QErrorMessage, QPushButton
 
-from domain.entities import Account, Statement, Accounts
+from domain.entities import Account, Statement
 from domain.exceptions import InvalidAmountException
 from domain.presenters.main_window_presenter import MainWindowPresenter, MonthlyAccountSummary
+from domain.repositories import StatementAbstractModel, AccountAbstractModel
+from domain.staticvalues import Accounts, AccountTypes
+from pyqt6.accounts_editor_dialog import AccountsEditorDialog
 from pyqt6.ui_files.ui_main_window import Ui_MainWindow
 
 
 class MainWindow(Ui_MainWindow):
-    def __init__(self, model):
+    def __init__(self, statement_model: StatementAbstractModel, account_model: AccountAbstractModel,
+                 accounts: Accounts, account_types: AccountTypes):
         super().__init__()
-        self._presenter = MainWindowPresenter(self, model)
+
+        self._accounts = accounts
+        self._account_types = account_types
+
+        self._account_model = account_model
+
+        self._presenter = MainWindowPresenter(self,
+                                              model=statement_model,
+                                              accounts=accounts,
+                                              account_types=account_types)
 
     def initialize_ui(self):
         # ウィンドウアイコンを設定
@@ -24,7 +37,7 @@ class MainWindow(Ui_MainWindow):
         self.dateEdit_dateInputViewer.dateChanged.connect(self._date_input_viewer_changed)
 
         # 選択中の勘定科目を「仕入」に設定
-        self.label_selectedAccount.setText(Accounts.Shiire.name)
+        self.label_selectedAccount.setText("仕入")
 
         # 日付変更ボタンのイベントを設定
         self.pshBtn_goBackOneDay.clicked.connect(self._date_change_buttons_clicked)
@@ -130,7 +143,7 @@ class MainWindow(Ui_MainWindow):
         y, m, d = date.year(), date.month(), date.day()
         text = self.lineEdit_amountEntryField.text()
         selected_account_name = self.label_selectedAccount.text()
-        i = Accounts.get_instance_by_name(selected_account_name)
+        i = self._accounts.get_account_by_name(selected_account_name)
         try:
             self._presenter.execute_registration(y, m, d, text, i)
         except InvalidAmountException:
@@ -138,18 +151,24 @@ class MainWindow(Ui_MainWindow):
 
     def _account_buttons_clicked(self):
         """
-        選択中の勘定科目を切り替えます
+        選択中の勘定科目を切り替えます。
+        科目に初期金額が設定されている場合は、インプット欄にセットします。
         :return: None
         """
         s = self.sender()
-        a = Accounts.get_instance_by_name(s.text())
-        self._presenter.change_selected_account(a)
+        if isinstance(s, QPushButton):
+            self._presenter.change_selected_account(s.text())
 
     def _menu_file_triggered(self):
         pass
 
-    def _menu_edit_triggered(self):
-        pass
+    def _menu_edit_triggered(self, action: QAction):
+        """「編集」メニューバーのアクション"""
+        if action is self.action_editAccounts:
+            dialog = AccountsEditorDialog(model=self._account_model,
+                                          accounts=self._accounts,
+                                          account_types=self._account_types)
+            dialog.exec()
 
     def _menu_tools_triggered(self):
         pass
@@ -170,14 +189,23 @@ class MainWindow(Ui_MainWindow):
         """金額入力欄をリセットします"""
         self.lineEdit_amountEntryField.clear()
 
+    def set_amount_entry_field(self, value: int):
+        """金額入力欄に値をセットします"""
+        self.lineEdit_amountEntryField.setText(str(value))
+
     def update_daily_summary_viewer(self, statements: list[Statement]):
         """明細テーブルを更新します"""
         self.tableWidget_dailySummaryViewer.clear()
         self.tableWidget_dailySummaryViewer.setHorizontalHeaderLabels(["勘定科目", "合計金額"])
         self.tableWidget_dailySummaryViewer.setRowCount(len(statements))
         for row, statement in enumerate(statements):
-            self.tableWidget_dailySummaryViewer.setItem(row, 0, QTableWidgetItem(statement.account.name))
-            self.tableWidget_dailySummaryViewer.setItem(row, 1, QTableWidgetItem(statement.amount.comma_value_with_unit))
+            account = self._accounts.get_account_by_id(statement.account_id)
+            if account is None:
+                continue
+            self.tableWidget_dailySummaryViewer.setItem(row, 0,
+                                                        QTableWidgetItem(account.name))
+            self.tableWidget_dailySummaryViewer.setItem(row, 1,
+                                                        QTableWidgetItem(statement.amount.comma_value_with_unit))
 
     def update_monthly_summary_viewer(self, summary: list[MonthlyAccountSummary]):
         """毎月の勘定科目ごとの日別合計金額を表示します"""

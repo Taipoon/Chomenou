@@ -1,6 +1,7 @@
 import abc
 
 from domain.entities import Statement, Account, MonthlyAccountSummary
+from domain.valueobjects import Amount
 
 
 class AbstractBaseView(abc.ABC):
@@ -54,6 +55,14 @@ class MainView(AbstractBaseView):
         pass
 
     @abc.abstractmethod
+    def set_amount_entry_field(self, value: int):
+        """
+        金額入力欄に値をセットします
+        :param value: 値
+        :return: None
+        """
+
+    @abc.abstractmethod
     def update_daily_summary_viewer(self, statements: list[Statement]):
         """
         日ごとのサマリを表示します
@@ -72,9 +81,17 @@ class MainView(AbstractBaseView):
         pass
 
 
-class BulkInsertionView(abc.ABC):
-    pass
+class AccountsEditorView(AbstractBaseView):
+    @abc.abstractmethod
+    def update_line_edit(self, account: Account, amount: Amount):
+        """
+        指定したアカウントの初期金額欄を更新します
+        :param account: 更新したいアカウント
+        :param amount: 更新する値
+        :return: None
+        """
+        pass
 
 
-class AccountsEditorView(abc.ABC):
+class BulkInsertionView(AbstractBaseView):
     pass

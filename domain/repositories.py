@@ -6,20 +6,30 @@ from domain.entities import AccountType, Account, Statement
 class AccountTypeAbstractModel(abc.ABC):
     @abc.abstractmethod
     def all(self) -> list[AccountType]:
+        """
+        すべての勘定科目タイプを返します。
+        :return: 勘定科目タイプのリスト
+        """
         pass
 
 
 class AccountAbstractModel(abc.ABC):
     @abc.abstractmethod
     def all(self) -> list[Account]:
+        """
+        すべての勘定科目を返します。
+        :return: 勘定科目のリスト
+        """
         pass
 
     @abc.abstractmethod
-    def get(self, account_name: str = None) -> str:
-        pass
-
-    @abc.abstractmethod
-    def update_default_amount(self, account: Account, amount: int):
+    def update_account(self, account_id: int, account: Account):
+        """
+        account_id で指定した勘定科目の情報を更新します。
+        :param account_id: 勘定科目ID
+        :param account: 更新したい勘定科目の情報
+        :return: None
+        """
         pass
 
 

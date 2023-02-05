@@ -30,64 +30,65 @@ class AccountTypeSQLite(SQLiteBase, AccountTypeAbstractModel):
         super().__init__()
 
     def all(self) -> list[AccountType]:
-        sql = "SELECT `id`, `type_name` FROM `account_types` ORDER BY `id`"
+        sql = "SELECT `id`, `type_name`, `type_name_hepburn` FROM `account_types` ORDER BY `id`"
         cursor: sqlite3.Cursor = self.conn.cursor()
         account_types = []
         try:
             cursor.execute(sql)
             for row in cursor:
-                type_id, type_name = row
-                account_types.append(AccountType(type_id=type_id, type_name=type_name))
+                type_id, type_name, type_name_hepburn = row
+                account_types.append(AccountType(type_id=type_id,
+                                                 type_name=type_name,
+                                                 type_name_hepburn=type_name_hepburn))
         finally:
             cursor.close()
             return account_types
 
 
 class AccountSQLite(SQLiteBase, AccountAbstractModel):
+
     def __init__(self):
         super().__init__()
 
     def all(self) -> list[Account]:
-        return self.get()
-
-    def get(self, accounts: list[Account] = None) -> list[Account]:
-        sql = "SELECT `a`.`id`, `a`.`account_name`, `a`.`account_type_id`, `a`.`default_amount`, `at`.`type_name` " \
+        sql = "SELECT `a`.`id`, `a`.`account_name`, `a`.`account_name_hepburn`, `a`.`account_type_id`, " \
+              "`a`.`default_amount`, `at`.`type_name`, `at`.`type_name_hepburn` " \
               "FROM `accounts` AS `a` LEFT JOIN `account_types` AS `at` " \
-              "ON `a`.`account_type_id` = `at`.`id`"
+              "ON `a`.`account_type_id` = `at`.`id` " \
+              "ORDER BY `a`.`id`"
 
-        conditions = []
-        if accounts:
-            for a in accounts:
-                conditions.append("id = " + str(a.id))
-            sql += " WHERE " + " AND ".join(conditions)
-
-        result_accounts = []
+        accounts = []
         cursor: sqlite3.Cursor = self.conn.cursor()
         try:
             cursor.execute(sql)
             for row in cursor:
-                account_id, account_name, account_type_id, default_amount, type_name = row
-                result_accounts.append(Account(account_id=account_id, account_name=account_name,
-                                               account_type=AccountType(type_id=account_type_id, type_name=type_name),
-                                               default_amount=default_amount))
+                account_id, account_name, account_name_hepburn, \
+                    account_type_id, default_amount, type_name, type_name_hepburn = row
+                accounts.append(Account(account_id=account_id, account_name=account_name,
+                                        account_name_hepburn=account_name_hepburn,
+                                        account_type=AccountType(type_id=account_type_id,
+                                                                 type_name=type_name,
+                                                                 type_name_hepburn=type_name_hepburn),
+                                        default_amount=Amount(default_amount)))
         finally:
             cursor.close()
-            return result_accounts
+            return accounts
 
-    def update_default_amount(self, account: Account, amount: int) -> bool:
-        sql = f"UPDATE `accounts` SET `default_amount` = {amount} WHERE `account_name` = '{account.name}'"
+    def update_account(self, account_id: int, account: Account):
+        sql = f"UPDATE `accounts` " \
+              f"SET `account_name` = {account.name}, " \
+              f"    `account_type_id` = {account.type.id}, " \
+              f"    `default_amount` = {account.default_amount.value} " \
+              f"WHERE `id` = {account_id}"
+
         cursor: sqlite3.Cursor = self.conn.cursor()
-
-        result = False
         try:
             cursor.execute(sql)
             self.conn.commit()
-            result = True
         except sqlite3.Error:
             self.conn.rollback()
         finally:
             cursor.close()
-            return result
 
 
 class StatementSQLite(SQLiteBase, StatementAbstractModel):

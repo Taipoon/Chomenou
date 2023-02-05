@@ -7,10 +7,9 @@
 
 
 from PyQt6 import QtCore, QtGui, QtWidgets
-from PyQt6.QtWidgets import QDialog
 
 
-class Ui_AccountsEditorDialog(QDialog):
+class Ui_AccountsEditorDialog(QtWidgets.QDialog):
     def __init__(self):
         super().__init__()
         self.setupUi()
@@ -33,21 +32,21 @@ class Ui_AccountsEditorDialog(QDialog):
         self.buttonBox.setOrientation(QtCore.Qt.Orientation.Horizontal)
         self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.StandardButton.Cancel|QtWidgets.QDialogButtonBox.StandardButton.Save)
         self.buttonBox.setObjectName("buttonBox")
-        self.label_oshibori_2 = QtWidgets.QLabel(self)
-        self.label_oshibori_2.setGeometry(QtCore.QRect(220, 70, 52, 18))
-        self.label_oshibori_2.setObjectName("label_oshibori_2")
-        self.label_oshibori_3 = QtWidgets.QLabel(self)
-        self.label_oshibori_3.setGeometry(QtCore.QRect(220, 100, 52, 18))
-        self.label_oshibori_3.setObjectName("label_oshibori_3")
-        self.label_oshibori_4 = QtWidgets.QLabel(self)
-        self.label_oshibori_4.setGeometry(QtCore.QRect(220, 130, 52, 18))
-        self.label_oshibori_4.setObjectName("label_oshibori_4")
-        self.label_oshibori_5 = QtWidgets.QLabel(self)
-        self.label_oshibori_5.setGeometry(QtCore.QRect(220, 160, 52, 18))
-        self.label_oshibori_5.setObjectName("label_oshibori_5")
-        self.label_oshibori_6 = QtWidgets.QLabel(self)
-        self.label_oshibori_6.setGeometry(QtCore.QRect(220, 190, 52, 18))
-        self.label_oshibori_6.setObjectName("label_oshibori_6")
+        self.label_oshibori_yen = QtWidgets.QLabel(self)
+        self.label_oshibori_yen.setGeometry(QtCore.QRect(220, 70, 52, 18))
+        self.label_oshibori_yen.setObjectName("label_oshibori_yen")
+        self.label_kujoki_yen = QtWidgets.QLabel(self)
+        self.label_kujoki_yen.setGeometry(QtCore.QRect(220, 100, 52, 18))
+        self.label_kujoki_yen.setObjectName("label_kujoki_yen")
+        self.label_risueki_yen = QtWidgets.QLabel(self)
+        self.label_risueki_yen.setGeometry(QtCore.QRect(220, 130, 52, 18))
+        self.label_risueki_yen.setObjectName("label_risueki_yen")
+        self.label_chosakuken_yen = QtWidgets.QLabel(self)
+        self.label_chosakuken_yen.setGeometry(QtCore.QRect(220, 160, 52, 18))
+        self.label_chosakuken_yen.setObjectName("label_chosakuken_yen")
+        self.label_karaoke_yen = QtWidgets.QLabel(self)
+        self.label_karaoke_yen.setGeometry(QtCore.QRect(220, 190, 52, 18))
+        self.label_karaoke_yen.setObjectName("label_karaoke_yen")
         self.lineEdit_chosakuken = QtWidgets.QLineEdit(self)
         self.lineEdit_chosakuken.setGeometry(QtCore.QRect(90, 158, 125, 21))
         self.lineEdit_chosakuken.setObjectName("lineEdit_chosakuken")
@@ -88,11 +87,11 @@ class Ui_AccountsEditorDialog(QDialog):
         _translate = QtCore.QCoreApplication.translate
         self.setWindowTitle(_translate("AccountsEditorDialog", "勘定科目の編集"))
         self._label.setText(_translate("AccountsEditorDialog", "固定費として事前入力したい金額を変更できます"))
-        self.label_oshibori_2.setText(_translate("AccountsEditorDialog", "円"))
-        self.label_oshibori_3.setText(_translate("AccountsEditorDialog", "円"))
-        self.label_oshibori_4.setText(_translate("AccountsEditorDialog", "円"))
-        self.label_oshibori_5.setText(_translate("AccountsEditorDialog", "円"))
-        self.label_oshibori_6.setText(_translate("AccountsEditorDialog", "円"))
+        self.label_oshibori_yen.setText(_translate("AccountsEditorDialog", "円"))
+        self.label_kujoki_yen.setText(_translate("AccountsEditorDialog", "円"))
+        self.label_risueki_yen.setText(_translate("AccountsEditorDialog", "円"))
+        self.label_chosakuken_yen.setText(_translate("AccountsEditorDialog", "円"))
+        self.label_karaoke_yen.setText(_translate("AccountsEditorDialog", "円"))
         self.label_karaoke.setText(_translate("AccountsEditorDialog", "カラオケ"))
         self.label_kujoki.setText(_translate("AccountsEditorDialog", "駆除器"))
         self.label_chosakuken.setText(_translate("AccountsEditorDialog", "著作権"))

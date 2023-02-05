@@ -1,66 +1,48 @@
-import os
-
-from PyQt6 import uic
 from PyQt6.QtGui import QIntValidator
 from PyQt6.QtWidgets import QLineEdit
 
-from domain.entities import AccountTypes, Account, Accounts
+from domain.entities import Account
+from domain.exceptions import AccountNotFoundException
+from domain.presenters.account_editor_dialog_presenter import AccountsEditorDialogPresenter
 from domain.repositories import AccountAbstractModel
-from infrastructure.sqlite import AccountSQLite
-from pyqt6.common.value_error_popup import ValueErrorPopup
+from domain.staticvalues import AccountTypes, Accounts
+from domain.valueobjects import Amount
+from domain.views import AccountsEditorView
 from pyqt6.ui_files.ui_accounts_editor_dialog import Ui_AccountsEditorDialog
 
 
 class AccountsEditorDialog(Ui_AccountsEditorDialog):
-    def __init__(self):
+    def __init__(self, model: AccountAbstractModel,
+                 accounts: Accounts, account_types: AccountTypes):
         super().__init__()
-        if os.environ.get("UI_DEBUG"):
-            uic.loadUi(os.path.join(os.path.dirname(__file__),
-                                    "ui_files",
-                                    "accountsEditorDialog.ui"), self)
-        self._presenter = None
-        self._initialize_ui()
+        self._accounts = accounts
+        self._account_types = account_types
+        self._presenter = AccountsEditorDialogPresenter(view=self, model=model)
 
-    def _initialize_ui(self):
-        self._presenter = AccountsEditorDialogPresenter(self, AccountSQLite())
-
-        self.lineEdit_chosakuken.setValidator(QIntValidator())
-        self.lineEdit_kujoki.setValidator(QIntValidator())
-        self.lineEdit_karaoke.setValidator(QIntValidator())
+    def initialize_ui(self):
+        # テキスト入力欄を整数のみ入力可能にする
         self.lineEdit_oshibori.setValidator(QIntValidator())
+        self.lineEdit_kujoki.setValidator(QIntValidator())
         self.lineEdit_risueki.setValidator(QIntValidator())
+        self.lineEdit_karaoke.setValidator(QIntValidator())
+        self.lineEdit_chosakuken.setValidator(QIntValidator())
 
-        self.accepted.connect(self._accepted)
+        # 固定費の初期値を取得してテキストフィールドに設定する
+        fixed_cost_id = self._account_types.get_account_type_by_name("固定費").id
+        for account in self._accounts.filter(account_type_id=fixed_cost_id):
+            self.update_line_edit(account=account, amount=account.default_amount)
 
-    def _accepted(self):
-        objects = self.children()
-        account_amount = dict()
-        for obj in objects:
-            if not isinstance(obj, QLineEdit):
-                continue
-            name = obj.objectName().split("_")[-1]
-            try:
-                input_amount = int(obj.text().replace(",", ""))
-            except ValueError:
-                ValueErrorPopup(self, content=f"{obj.text()} は入力値として正しくありません")
-                continue
+        # 入力欄の一番上にフォーカスを設定する
+        self.lineEdit_oshibori.setFocus()
 
-            account = Accounts.get_instance_by_hepburn(name.lower())
-            account_amount[account] = input_amount
-        self._presenter.update_default_amounts(account_amount=account_amount)
+        # TODO: 保存ボタンのテキストを設定する
 
+    def update_line_edit(self, account: Account, amount: Amount):
+        """引数で指定した account の 初期金額入力欄を amount で更新します"""
 
-class AccountsEditorDialogPresenter(object):
-    def __init__(self, view, model: AccountAbstractModel):
-        self._view = view
-        self._model = model
+        h_name = account.name_hepburn
+        if not hasattr(self, "lineEdit_" + h_name):
+            raise AccountNotFoundException
 
-    def get_all_account(self):
-        account_types = self._model.all()
-        fixed_cost_accounts = [a for a in account_types if a.type == AccountTypes.FixedCost]
-        print(fixed_cost_accounts)
-
-    def update_default_amounts(self, account_amount: dict[Account: int]):
-        for account, amount in account_amount.items():
-            print(account, amount)
-            # self._model.update_default_amount(account=account, amount=amount)
+        edit: QLineEdit = getattr(self, "lineEdit_" + h_name)
+        edit.setText(str(amount.value))
