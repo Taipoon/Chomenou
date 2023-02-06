@@ -3,16 +3,16 @@ from domain.exceptions import AccountTypeNotFoundException, AccountNotFoundExcep
 from domain.repositories import AccountAbstractModel, AccountTypeAbstractModel
 
 
-class Singleton(object):
-    _instance = None
+class Singleton(type):
+    _instances = {}
 
-    def __new__(cls, *args, **kwargs):
-        if not hasattr(cls, "_instance") or cls._instance is None:
-            cls._instance = super(Singleton, cls).__new__(cls)
-        return cls._instance
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super().__call__(*args, **kwargs)
+        return cls._instances[cls]
 
 
-class AccountTypes(Singleton):
+class AccountTypes(metaclass=Singleton):
     def __init__(self, model: AccountTypeAbstractModel):
         self._model = model
         self._account_types: list[AccountType] = []
@@ -31,7 +31,7 @@ class AccountTypes(Singleton):
         raise AccountTypeNotFoundException
 
 
-class Accounts(Singleton):
+class Accounts(metaclass=Singleton):
     def __init__(self, model: AccountAbstractModel):
         self._model = model
         self._accounts: list[Account] = []
