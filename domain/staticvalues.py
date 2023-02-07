@@ -1,6 +1,7 @@
 from domain.entities import AccountType, Account
 from domain.exceptions import AccountTypeNotFoundException, AccountNotFoundException
-from domain.repositories import AccountAbstractModel, AccountTypeAbstractModel
+from domain.repositories import IAccountTypeRepository, IAccountRepository
+from infrastructure.factories import AccountTypeFactory, AccountFactory
 
 
 class Singleton(type):
@@ -13,13 +14,13 @@ class Singleton(type):
 
 
 class AccountTypes(metaclass=Singleton):
-    def __init__(self, model: AccountTypeAbstractModel):
-        self._model = model
+    def __init__(self, account_type_repository: IAccountTypeRepository = AccountTypeFactory.create()):
+        self._account_type_repository = account_type_repository
         self._account_types: list[AccountType] = []
         self._initialize()
 
     def _initialize(self):
-        self._account_types = self._model.all()
+        self._account_types = self._account_type_repository.all()
 
     def all(self) -> list[AccountType]:
         return self._account_types
@@ -32,13 +33,13 @@ class AccountTypes(metaclass=Singleton):
 
 
 class Accounts(metaclass=Singleton):
-    def __init__(self, model: AccountAbstractModel):
-        self._model = model
+    def __init__(self, account_repository: IAccountRepository = AccountFactory.create()):
+        self._account_repository = account_repository
         self._accounts: list[Account] = []
         self._initialize()
 
     def _initialize(self):
-        self._accounts = self._model.all()
+        self._accounts = self._account_repository.all()
 
     def all(self) -> list[Account]:
         return self._accounts

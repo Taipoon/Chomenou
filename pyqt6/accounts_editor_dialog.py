@@ -4,20 +4,21 @@ from PyQt6.QtWidgets import QLineEdit
 from domain.entities import Account
 from domain.exceptions import AccountNotFoundException
 from domain.presenters.account_editor_dialog_presenter import AccountsEditorDialogPresenter
-from domain.repositories import AccountAbstractModel
+
 from domain.staticvalues import AccountTypes, Accounts
 from domain.valueobjects import Amount
-from domain.views import AccountsEditorView
+from infrastructure.factories import AccountFactory
 from pyqt6.ui_files.ui_accounts_editor_dialog import Ui_AccountsEditorDialog
 
 
 class AccountsEditorDialog(Ui_AccountsEditorDialog):
-    def __init__(self, model: AccountAbstractModel,
-                 accounts: Accounts, account_types: AccountTypes):
+    def __init__(self):
         super().__init__()
-        self._accounts = accounts
-        self._account_types = account_types
-        self._presenter = AccountsEditorDialogPresenter(view=self, model=model)
+        self._accounts = Accounts()
+        self._account_types = AccountTypes()
+
+        self._account_repository = AccountFactory()
+        self._presenter = AccountsEditorDialogPresenter(view=self)
 
     def initialize_ui(self):
         # テキスト入力欄を整数のみ入力可能にする

@@ -2,7 +2,7 @@ import datetime
 
 
 class Amount(object):
-    UnitName = "円"
+    unit_name = "円"
 
     def __init__(self, amount: int):
         self._amount = amount
@@ -13,11 +13,11 @@ class Amount(object):
 
     @property
     def value_with_unit(self) -> str:
-        return str(self.value) + self.UnitName
+        return str(self.value) + self.unit_name
 
     @property
     def comma_value_with_unit(self) -> str:
-        return f"{self.value:,} {self.UnitName}"
+        return f"{self.value:,} {self.unit_name}"
 
 
 class StatementCreatedAt(object):

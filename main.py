@@ -4,9 +4,8 @@ import sys
 import dotenv
 from PyQt6.QtWidgets import QApplication
 
+from domain.shared import Config
 from domain.staticvalues import AccountTypes, Accounts
-from infrastructure.mock import StatementMock, AccountTypeMock, AccountMock
-from infrastructure.sqlite import StatementSQLite, AccountTypeSQLite, AccountSQLite
 from pyqt6.main_window import MainWindow
 
 ACCOUNT_TYPES: AccountTypes
@@ -24,24 +23,11 @@ def main():
     # Create application instance
     app = QApplication(sys.argv)
 
-    """
-    if envs.get("REPOSITORY_DEBUG"):
-        statements_repository = StatementMock()
-        account_types_repository = AccountTypeMock()
-        accounts_repository = AccountMock()
-    else:
-    """
-    statements_repository = StatementSQLite()
-    account_types_repository = AccountTypeSQLite()
-    accounts_repository = AccountSQLite()
+    c = Config()
+    if c.ui_debug and c.repository_debug:
+        print("DEBUG MODE")
 
-    account_types = AccountTypes(account_types_repository)
-    accounts = Accounts(accounts_repository)
-
-    window = MainWindow(statement_model=statements_repository,
-                        account_model=accounts_repository,
-                        accounts=accounts,
-                        account_types=account_types)
+    window = MainWindow()
     window.show()
 
     # Run the application

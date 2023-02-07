@@ -2,11 +2,11 @@ import datetime
 import random
 
 from domain.entities import Account, Statement, AccountType
-from domain.repositories import StatementAbstractModel, AccountAbstractModel, AccountTypeAbstractModel
+from domain.repositories import IStatementRepository, IAccountTypeRepository, IAccountRepository
 from domain.valueobjects import Amount, StatementCreatedAt
 
 
-class StatementMock(StatementAbstractModel):
+class StatementMock(IStatementRepository):
     def __init__(self):
         self._statements = []
         today = datetime.date.today()
@@ -26,10 +26,13 @@ class StatementMock(StatementAbstractModel):
         statement = [s for s in self._statements if s.year == year]
         if month is not None:
             statement = [s for s in statement if s.month == month]
+
         if day is not None:
             statement = [s for s in statement if s.day == day]
+
         if account is not None:
-            statement = [s for s in statement if s.account.id == account.id]
+            statement = [s for s in statement if s.account_id == account.id]
+
         return statement
 
     def insert(self, statement: Statement):
@@ -60,7 +63,7 @@ class StatementMock(StatementAbstractModel):
         return s
 
 
-class AccountTypeMock(AccountTypeAbstractModel):
+class AccountTypeMock(IAccountTypeRepository):
     def __init__(self):
         self._account_type: list[AccountType] = []
         self._setup()
@@ -76,7 +79,7 @@ class AccountTypeMock(AccountTypeAbstractModel):
         return self._account_type
 
 
-class AccountMock(AccountAbstractModel):
+class AccountMock(IAccountRepository):
     def __init__(self):
         self._accounts: list[Account] = []
         self._setup()
@@ -92,12 +95,26 @@ class AccountMock(AccountAbstractModel):
             Account(3, "雑費", "zappi", hendohi, 0),
             Account(4, "消耗品", "shomohin", hendohi, 0),
             Account(5, "家賃", "yachin", hendohi, 0),
+
+            Account(6, "アイス", "aisu", hendohi, 0),
+            Account(7, "大阪ガス", "osakagas", hendohi, 0),
+            Account(8, "保険", "hoken", hendohi, 0),
+            Account(9, "通信費", "tsushinhi", hendohi, 0),
+            Account(10, "修繕費", "shuzenhi", hendohi, 0),
+
+            Account(11, "広告費", "kokokuhi", hendohi, 8800),
+            Account(12, "自動車税", "jidoshazei", hendohi, 2000),
+            Account(13, "酒代", "sakadai", hendohi, 14000),
+            Account(14, "備品", "bihin", hendohi, 14000),
+
             # 固定費
-            Account(6, "おしぼり", "oshibori", koteihi, 8800),
-            Account(7, "駆除機", "kujoki", koteihi, 2000),
-            Account(8, "リース植木", "risueki", koteihi, 14000),
-            # 売上
-            Account(9, "売上", "uriage", uriage, 0)
+            Account(15, "おしぼり", "oshibori", koteihi, 8000),
+            Account(16, "駆除機", "kujoki", koteihi, 7000),
+            Account(17, "リース植木", "risueki", koteihi, 6000),
+            Account(18, "著作権", "chosakuken", koteihi, 5000),
+            Account(19, "カラオケ", "karaoke", koteihi, 5000),
+
+            Account(20, "売上", "uriage", uriage, 0)
         ]
         return self._accounts
 

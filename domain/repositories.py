@@ -3,24 +3,24 @@ import abc
 from domain.entities import AccountType, Account, Statement
 
 
-class AccountTypeAbstractModel(abc.ABC):
+class IAccountTypeRepository(abc.ABC):
     @abc.abstractmethod
     def all(self) -> list[AccountType]:
         """
         すべての勘定科目タイプを返します。
         :return: 勘定科目タイプのリスト
         """
-        pass
+        raise NotImplementedError
 
 
-class AccountAbstractModel(abc.ABC):
+class IAccountRepository(abc.ABC):
     @abc.abstractmethod
     def all(self) -> list[Account]:
         """
         すべての勘定科目を返します。
         :return: 勘定科目のリスト
         """
-        pass
+        raise NotImplementedError
 
     @abc.abstractmethod
     def update_account(self, account_id: int, account: Account):
@@ -30,10 +30,10 @@ class AccountAbstractModel(abc.ABC):
         :param account: 更新したい勘定科目の情報
         :return: None
         """
-        pass
+        raise NotImplementedError
 
 
-class StatementAbstractModel(abc.ABC):
+class IStatementRepository(abc.ABC):
     @abc.abstractmethod
     def get(self, year: int, month: int, day: int, account: Account or None) -> list[Statement]:
         """
@@ -45,7 +45,7 @@ class StatementAbstractModel(abc.ABC):
         :param account: 勘定科目
         :return: 明細
         """
-        pass
+        raise NotImplementedError
 
     @abc.abstractmethod
     def insert(self, statement: Statement):
@@ -54,7 +54,7 @@ class StatementAbstractModel(abc.ABC):
         :param statement: 追加する明細
         :return: None
         """
-        pass
+        raise NotImplementedError
 
     @abc.abstractmethod
     def get_daily_account_summary(self, year: int, month: int, day: int) -> list[Statement]:
@@ -65,7 +65,7 @@ class StatementAbstractModel(abc.ABC):
         :param day: 日
         :return: 明細
         """
-        pass
+        raise NotImplementedError
 
     @abc.abstractmethod
     def get_monthly_account_summary(self, year: int, month: int) -> list[Statement]:
@@ -76,7 +76,7 @@ class StatementAbstractModel(abc.ABC):
         :param month: 月
         :return: 明細
         """
-        pass
+        raise NotImplementedError
 
     @abc.abstractmethod
     def get_details_summary_by_accounts(self, year: int, month: int, account: Account) -> list[Statement]:
@@ -87,4 +87,4 @@ class StatementAbstractModel(abc.ABC):
         :param account: 勘定科目
         :return: 明細
         """
-        pass
+        raise NotImplementedError

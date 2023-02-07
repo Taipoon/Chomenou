@@ -2,20 +2,20 @@ import datetime
 
 from domain.entities import Statement, Account, MonthlyAccountSummary
 from domain.exceptions import InvalidAmountException
-from domain.repositories import StatementAbstractModel
 from domain.staticvalues import AccountTypes, Accounts
 from domain.valueobjects import Amount, StatementCreatedAt
 from domain.views import MainView
+from infrastructure.factories import StatementFactory
 
 
 class MainWindowPresenter(object):
-    def __init__(self, view: MainView, model: StatementAbstractModel,
-                 accounts: Accounts, account_types: AccountTypes):
-        self._accounts = accounts
-        self._account_types = account_types
+    def __init__(self, view: MainView):
+        self._accounts = Accounts()
+        self._account_types = AccountTypes()
+
+        self._statement_repository = StatementFactory.create()
 
         self._view = view
-        self._model = model
         self._view.initialize_ui()
 
         today = datetime.date.today()
@@ -52,7 +52,7 @@ class MainWindowPresenter(object):
                                   account_id=account.id, amount=amount,
                                   created_at=StatementCreatedAt(now))
             # データを新規登録する
-            self._model.insert(statement=statement)
+            self._statement_repository.insert(statement=statement)
             # 入力欄をクリア
             self._view.clear_amount_entry_field()
             # サマリの更新
@@ -68,7 +68,7 @@ class MainWindowPresenter(object):
     def _update_daily_summary_viewer(self, year: int, month: int, day: int):
         """日別サマリの更新"""
         print("日別サマリの更新")
-        statements = self._model.get_daily_account_summary(year=year, month=month, day=day)
+        statements = self._statement_repository.get_daily_account_summary(year=year, month=month, day=day)
         self._view.update_daily_summary_viewer(statements)
 
     def _update_monthly_summary_viewer(self, year: int, month: int):
@@ -76,12 +76,12 @@ class MainWindowPresenter(object):
         print("月別サマリの更新")
         summary_results = []
 
-        statements = self._model.get_monthly_account_summary(year=year, month=month)
+        statements = self._statement_repository.get_monthly_account_summary(year=year, month=month)
         for statement in statements:
             account = self._accounts.get_account_by_id(statement.account_id)
             if account is None:
                 continue
-            details = self._model.get_details_summary_by_accounts(year, month, account)
+            details = self._statement_repository.get_details_summary_by_accounts(year, month, account)
 
             summary = MonthlyAccountSummary(account=account,
                                             total_amount=statement.amount,

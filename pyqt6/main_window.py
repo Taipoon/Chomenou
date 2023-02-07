@@ -5,26 +5,24 @@ from PyQt6.QtWidgets import QTableWidgetItem, QTreeWidgetItem, QErrorMessage, QP
 from domain.entities import Account, Statement
 from domain.exceptions import InvalidAmountException
 from domain.presenters.main_window_presenter import MainWindowPresenter, MonthlyAccountSummary
-from domain.repositories import StatementAbstractModel, AccountAbstractModel
+from domain.repositories import IAccountRepository, IStatementRepository
 from domain.staticvalues import Accounts, AccountTypes
+from infrastructure.factories import StatementFactory, AccountFactory
 from pyqt6.accounts_editor_dialog import AccountsEditorDialog
 from pyqt6.ui_files.ui_main_window import Ui_MainWindow
 
 
 class MainWindow(Ui_MainWindow):
-    def __init__(self, statement_model: StatementAbstractModel, account_model: AccountAbstractModel,
-                 accounts: Accounts, account_types: AccountTypes):
+    def __init__(self):
         super().__init__()
 
-        self._accounts = accounts
-        self._account_types = account_types
+        self._accounts = Accounts()
+        self._account_types = AccountTypes()
 
-        self._account_model = account_model
+        self._statement_repository = StatementFactory.create()
+        self._account_repository = AccountFactory.create()
 
-        self._presenter = MainWindowPresenter(self,
-                                              model=statement_model,
-                                              accounts=accounts,
-                                              account_types=account_types)
+        self._presenter = MainWindowPresenter(view=self)
 
     def initialize_ui(self):
         # ウィンドウアイコンを設定
@@ -165,9 +163,7 @@ class MainWindow(Ui_MainWindow):
     def _menu_edit_triggered(self, action: QAction):
         """「編集」メニューバーのアクション"""
         if action is self.action_editAccounts:
-            dialog = AccountsEditorDialog(model=self._account_model,
-                                          accounts=self._accounts,
-                                          account_types=self._account_types)
+            dialog = AccountsEditorDialog()
             dialog.exec()
 
     def _menu_tools_triggered(self):

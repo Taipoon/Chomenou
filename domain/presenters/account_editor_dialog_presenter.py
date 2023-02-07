@@ -1,9 +1,10 @@
-from domain.repositories import AccountAbstractModel
 from domain.views import AccountsEditorView
+from infrastructure.factories import AccountTypeFactory
 
 
 class AccountsEditorDialogPresenter(object):
-    def __init__(self, view: AccountsEditorView, model: AccountAbstractModel):
+    def __init__(self, view: AccountsEditorView):
+        self._account_type_repository = AccountTypeFactory()
+
         self._view = view
-        self._model = model
         self._view.initialize_ui()
