@@ -67,13 +67,11 @@ class MainWindowPresenter(object):
 
     def _update_daily_summary_viewer(self, year: int, month: int, day: int):
         """日別サマリの更新"""
-        print("日別サマリの更新")
         statements = self._statement_repository.get_daily_account_summary(year=year, month=month, day=day)
         self._view.update_daily_summary_viewer(statements)
 
     def _update_monthly_summary_viewer(self, year: int, month: int):
         """月別サマリの更新"""
-        print("月別サマリの更新")
         summary_results = []
 
         statements = self._statement_repository.get_monthly_account_summary(year=year, month=month)

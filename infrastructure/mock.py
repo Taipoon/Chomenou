@@ -1,12 +1,15 @@
+import abc
 import datetime
 import random
 
 from domain.entities import Account, Statement, AccountType
+from domain.helpers.metaclass_resolver import make_cls
 from domain.repositories import IStatementRepository, IAccountTypeRepository, IAccountRepository
+from domain.shared import Singleton
 from domain.valueobjects import Amount, StatementCreatedAt
 
 
-class StatementMock(IStatementRepository):
+class StatementMock(IStatementRepository, metaclass=make_cls(abc.ABCMeta, Singleton)):
     def __init__(self):
         self._statements = []
         today = datetime.date.today()
@@ -63,7 +66,7 @@ class StatementMock(IStatementRepository):
         return s
 
 
-class AccountTypeMock(IAccountTypeRepository):
+class AccountTypeMock(IAccountTypeRepository, metaclass=make_cls(abc.ABCMeta, Singleton)):
     def __init__(self):
         self._account_type: list[AccountType] = []
         self._setup()
@@ -79,8 +82,9 @@ class AccountTypeMock(IAccountTypeRepository):
         return self._account_type
 
 
-class AccountMock(IAccountRepository):
+class AccountMock(IAccountRepository, metaclass=make_cls(abc.ABCMeta, Singleton)):
     def __init__(self):
+        super().__init__()
         self._accounts: list[Account] = []
         self._setup()
 
@@ -90,31 +94,30 @@ class AccountMock(IAccountRepository):
         uriage = AccountType(3, "売上", "uriage")
         self._accounts = [
             # 変動費
-            Account(1, "仕入", "shiire", hendohi, 0),
-            Account(2, "接待", "settai", hendohi, 0),
-            Account(3, "雑費", "zappi", hendohi, 0),
-            Account(4, "消耗品", "shomohin", hendohi, 0),
-            Account(5, "家賃", "yachin", hendohi, 0),
+            Account(1, "仕入", "shiire", hendohi),
+            Account(2, "接待", "settai", hendohi),
+            Account(3, "雑費", "zappi", hendohi),
+            Account(4, "消耗品", "shomohin", hendohi),
+            Account(5, "家賃", "yachin", hendohi),
 
-            Account(6, "アイス", "aisu", hendohi, 0),
-            Account(7, "大阪ガス", "osakagas", hendohi, 0),
-            Account(8, "保険", "hoken", hendohi, 0),
-            Account(9, "通信費", "tsushinhi", hendohi, 0),
-            Account(10, "修繕費", "shuzenhi", hendohi, 0),
+            Account(6, "アイス", "aisu", hendohi),
+            Account(7, "大阪ガス", "osakagas", hendohi),
+            Account(8, "保険", "hoken", hendohi),
+            Account(9, "通信費", "tsushinhi", hendohi),
+            Account(10, "修繕費", "shuzenhi", hendohi),
 
-            Account(11, "広告費", "kokokuhi", hendohi, 8800),
-            Account(12, "自動車税", "jidoshazei", hendohi, 2000),
-            Account(13, "酒代", "sakadai", hendohi, 14000),
-            Account(14, "備品", "bihin", hendohi, 14000),
-
+            Account(11, "広告費", "kokokuhi", hendohi, Amount(8800)),
+            Account(12, "自動車税", "jidoshazei", hendohi, Amount(2000)),
+            Account(13, "酒代", "sakadai", hendohi, Amount(14000)),
+            Account(14, "備品", "bihin", hendohi, Amount(14000)),
             # 固定費
-            Account(15, "おしぼり", "oshibori", koteihi, 8000),
-            Account(16, "駆除機", "kujoki", koteihi, 7000),
-            Account(17, "リース植木", "risueki", koteihi, 6000),
-            Account(18, "著作権", "chosakuken", koteihi, 5000),
-            Account(19, "カラオケ", "karaoke", koteihi, 5000),
-
-            Account(20, "売上", "uriage", uriage, 0)
+            Account(15, "おしぼり", "oshibori", koteihi, Amount(2500)),
+            Account(16, "駆除機", "kujoki", koteihi, Amount(7000)),
+            Account(17, "リース植木", "risueki", koteihi, Amount(6000)),
+            Account(18, "著作権", "chosakuken", koteihi, Amount(5000)),
+            Account(19, "カラオケ", "karaoke", koteihi, Amount(5000)),
+            # 売上
+            Account(20, "売上", "uriage", uriage),
         ]
         return self._accounts
 
