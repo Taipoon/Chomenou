@@ -33,3 +33,10 @@ class Config(metaclass=Singleton):
 
         except AttributeError:
             raise InvalidConfigException
+
+
+class Signal():
+    ABOUT = 100
+    INFO = 200
+    WARNING = 300
+    CRITICAL = 400
