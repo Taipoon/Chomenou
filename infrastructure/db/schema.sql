@@ -46,7 +46,7 @@ VALUES ('仕入', 'shiire', 1, 0),
        ('備品', 'bihin', 1, 0),
 
        ('おしぼり', 'oshibori', 2, 0),
-       ('駆除機', 'kujoki', 2, 0),
+       ('駆除器', 'kujoki', 2, 0),
        ('リース植木', 'risueki', 2, 0),
        ('著作権', 'chosakuken', 2, 0),
        ('カラオケ', 'karaoke', 2, 0),

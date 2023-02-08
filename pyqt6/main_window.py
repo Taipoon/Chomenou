@@ -4,15 +4,16 @@ from PyQt6.QtWidgets import QTableWidgetItem, QTreeWidgetItem, QErrorMessage, QP
 
 from domain.entities import Account, Statement
 from domain.exceptions import InvalidAmountException
+from domain.helpers.metaclass_resolver import make_cls
 from domain.presenters.main_window_presenter import MainWindowPresenter, MonthlyAccountSummary
-from domain.repositories import IAccountRepository, IStatementRepository
 from domain.staticvalues import Accounts, AccountTypes
+from domain.views import MainView
 from infrastructure.factories import StatementFactory, AccountFactory
 from pyqt6.accounts_editor_dialog import AccountsEditorDialog
 from pyqt6.ui_files.ui_main_window import Ui_MainWindow
 
 
-class MainWindow(Ui_MainWindow):
+class MainWindow(Ui_MainWindow, MainView, metaclass=make_cls()):
     def __init__(self):
         super().__init__()
 

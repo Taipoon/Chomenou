@@ -2,16 +2,18 @@ from PyQt6.QtGui import QIntValidator
 from PyQt6.QtWidgets import QLineEdit
 
 from domain.entities import Account
-from domain.exceptions import AccountNotFoundException
+from domain.exceptions import AccountNotFoundException, InvalidAmountException
+from domain.helpers.metaclass_resolver import make_cls
 from domain.presenters.account_editor_dialog_presenter import AccountsEditorDialogPresenter
 
 from domain.staticvalues import AccountTypes, Accounts
 from domain.valueobjects import Amount
+from domain.views import AccountsEditorView
 from infrastructure.factories import AccountFactory
 from pyqt6.ui_files.ui_accounts_editor_dialog import Ui_AccountsEditorDialog
 
 
-class AccountsEditorDialog(Ui_AccountsEditorDialog):
+class AccountsEditorDialog(Ui_AccountsEditorDialog, AccountsEditorView, metaclass=make_cls()):
     def __init__(self):
         super().__init__()
         self._accounts = Accounts()
@@ -37,6 +39,35 @@ class AccountsEditorDialog(Ui_AccountsEditorDialog):
         self.lineEdit_oshibori.setFocus()
 
         # TODO: 保存ボタンのテキストを設定する
+        self.buttonBox.accepted.connect(self._button_box_accepted)
+
+    def _button_box_accepted(self):
+        update_accounts = []
+        try:
+            for name, obj in self.__dict__.items():
+                if not isinstance(obj, QLineEdit):
+                    continue
+
+                if name.startswith("lineEdit_"):
+                    # UI 部品名から、該当する勘定科目オブジェクトを取得
+                    hepburn_name = name.split("_")[1]
+                    account = Accounts().get_account_by_hepburn(hepburn=hepburn_name)
+
+                    # 入力された金額を整数に変換する
+                    updated_value = int(obj.text().replace(",", ""))
+
+                    updated_account = Account(
+                        account_id=account.id,
+                        account_name=account.name,
+                        account_name_hepburn=account.name_hepburn,
+                        account_type=account.type,
+                        default_amount=Amount(updated_value),
+                    )
+                    update_accounts.append(updated_account)
+        except ValueError:
+            raise InvalidAmountException
+
+        self._presenter.save(update_accounts=update_accounts)
 
     def update_line_edit(self, account: Account, amount: Amount):
         """引数で指定した account の 初期金額入力欄を amount で更新します"""

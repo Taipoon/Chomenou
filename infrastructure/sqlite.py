@@ -72,7 +72,7 @@ class AccountSQLite(SQLiteBase, IAccountRepository):
 
     def update_account(self, account_id: int, account: Account):
         sql = f"UPDATE `accounts` " \
-              f"SET `account_name` = {account.name}, " \
+              f"SET `account_name` = '{account.name}', " \
               f"    `account_type_id` = {account.type.id}, " \
               f"    `default_amount` = {account.default_amount.value} " \
               f"WHERE `id` = {account_id}"

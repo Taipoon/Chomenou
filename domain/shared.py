@@ -13,33 +13,23 @@ class Singleton(type):
 
 
 class Config(metaclass=Singleton):
-    def __init__(self):
-        self._ui_debug = False
-        self._repository_debug = False
-        self._sqlite_path = None
-        self._output_excel_filepath = None
-        self._output_csv_filepath = None
+    ui_debug = False
+    repository_debug = False
+    sqlite_path = None
+    output_excel_filepath = None
+    output_csv_filepath = None
 
-        envs = dotenv.dotenv_values()
-        self._parse(envs)
-
-    def _parse(self, envs: dict):
+    @classmethod
+    def parse(cls):
         try:
-            self._ui_debug = envs.get("UI_DEBUG").lower() == "true"
-            self._repository_debug = envs.get("REPOSITORY_DEBUG").lower() == "true"
+            envs = dotenv.dotenv_values()
+            cls.ui_debug = envs.get("UI_DEBUG").lower() == "true"
+            cls.repository_debug = envs.get("REPOSITORY_DEBUG").lower() == "true"
 
-            self._sqlite_path = envs.get("SQLITE_PATH")
+            cls.sqlite_path = envs.get("SQLITE_PATH")
 
-            self._output_excel_filepath = envs.get("OUTPUT_EXCEL_FILENAME")
-            self._output_csv_filepath = envs.get("OUTPUT_CSV_FILENAME")
+            cls.output_excel_filepath = envs.get("OUTPUT_EXCEL_FILENAME")
+            cls.output_csv_filepath = envs.get("OUTPUT_CSV_FILENAME")
 
         except AttributeError:
             raise InvalidConfigException
-
-    @property
-    def ui_debug(self) -> bool:
-        return self._ui_debug
-
-    @property
-    def repository_debug(self) -> bool:
-        return self._repository_debug
