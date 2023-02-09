@@ -19,11 +19,11 @@ class Config(metaclass=Singleton):
     output_csv_filepath = None
 
     @classmethod
-    def parse(cls):
+    def parse(cls, force_debug=False):
         try:
             envs = dotenv.dotenv_values()
             # use fake data
-            cls.is_fake = envs.get("IS_FAKE").lower() == "true"
+            cls.is_fake = envs.get("IS_FAKE").lower() == "true" or force_debug
             # path to sqlite database
             cls.sqlite_path = envs.get("SQLITE_PATH")
             # path to output files

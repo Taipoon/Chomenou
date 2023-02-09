@@ -3,6 +3,7 @@ import unittest
 
 from domain.entities import Statement
 from domain.presenters.main_window_presenter import MainWindowPresenter
+from domain.shared import Config
 from domain.staticvalues import Accounts
 from domain.valueobjects import Amount, StatementCreatedAt
 from infrastructure.factories import StatementFactory
@@ -11,6 +12,7 @@ from pyqt6.mock import MainViewMock
 
 class TestMainWindowPresenter(unittest.TestCase):
     def setUp(self) -> None:
+        Config.parse(force_debug=True)
         self.view = MainViewMock()
         self.presenter = MainWindowPresenter(self.view)
         self.repository = StatementFactory.create()
@@ -59,7 +61,7 @@ class TestMainWindowPresenter(unittest.TestCase):
             self.assertEqual(2000, got.year)
             self.assertEqual(9, got.month)
             self.assertEqual(3, got.day)
-            self.assertEqual(Amount(3000), got.month)
+            self.assertEqual(Amount(3000), got.amount)
 
 
 if __name__ == '__main__':
