@@ -1,6 +1,6 @@
 from PyQt6.QtCore import QDate
 from PyQt6.QtGui import QIntValidator, QIcon, QAction
-from PyQt6.QtWidgets import QTableWidgetItem, QTreeWidgetItem, QErrorMessage, QPushButton
+from PyQt6.QtWidgets import QTableWidgetItem, QTreeWidgetItem, QErrorMessage, QPushButton, QWidget, QDialog
 
 from domain.entities import Account, Statement
 from domain.exceptions import InvalidAmountException
@@ -9,7 +9,7 @@ from domain.presenters.main_window_presenter import MainWindowPresenter, Monthly
 from domain.staticvalues import Accounts, AccountTypes
 from domain.views import MainView
 from infrastructure.factories import StatementFactory, AccountFactory
-from pyqt6.accounts_editor_dialog import AccountsEditorDialog
+from pyqt6.factories import AccountsEditorFactory
 from pyqt6.ui_files.ui_main_window import Ui_MainWindow
 
 
@@ -164,8 +164,8 @@ class MainWindow(Ui_MainWindow, MainView, metaclass=make_cls()):
     def _menu_edit_triggered(self, action: QAction):
         """「編集」メニューバーのアクション"""
         if action is self.action_editAccounts:
-            dialog = AccountsEditorDialog()
-            dialog.exec()
+            accounts_editor_dialog = AccountsEditorFactory.create()
+            accounts_editor_dialog.exec()
 
     def _menu_tools_triggered(self):
         pass

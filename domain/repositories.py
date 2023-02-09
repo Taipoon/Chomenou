@@ -35,7 +35,8 @@ class IAccountRepository(abc.ABC):
 
 class IStatementRepository(abc.ABC):
     @abc.abstractmethod
-    def get(self, year: int, month: int, day: int, account: Account or None) -> list[Statement]:
+    def get(self, year: int or None = None, month: int or None = None,
+            day: int or None = None, account: Account or None = None) -> list[Statement]:
         """
         すべての明細の中から、年、月、日、勘定科目を絞り込み条件として取得します。
         指定しない場合、すべてを取得します。

@@ -13,8 +13,7 @@ class Singleton(type):
 
 
 class Config(metaclass=Singleton):
-    ui_debug = False
-    repository_debug = False
+    is_fake = None
     sqlite_path = None
     output_excel_filepath = None
     output_csv_filepath = None
@@ -23,11 +22,11 @@ class Config(metaclass=Singleton):
     def parse(cls):
         try:
             envs = dotenv.dotenv_values()
-            cls.ui_debug = envs.get("UI_DEBUG").lower() == "true"
-            cls.repository_debug = envs.get("REPOSITORY_DEBUG").lower() == "true"
-
+            # use fake data
+            cls.is_fake = envs.get("IS_FAKE").lower() == "true"
+            # path to sqlite database
             cls.sqlite_path = envs.get("SQLITE_PATH")
-
+            # path to output files
             cls.output_excel_filepath = envs.get("OUTPUT_EXCEL_FILENAME")
             cls.output_csv_filepath = envs.get("OUTPUT_CSV_FILENAME")
 
@@ -35,7 +34,7 @@ class Config(metaclass=Singleton):
             raise InvalidConfigException
 
 
-class Signal():
+class Signal(object):
     ABOUT = 100
     INFO = 200
     WARNING = 300
