@@ -1,12 +1,11 @@
 import datetime
 import unittest
 
-from domain.entities import Statement
 from domain.presenters.main_window_presenter import MainWindowPresenter
 from domain.shared import Config
 from domain.staticvalues import Accounts
-from domain.valueobjects import Amount, StatementCreatedAt
-from infrastructure.factories import StatementFactory
+from domain.valueobjects import Amount
+from infrastructure.mock import StatementMock
 from pyqt6.mock import MainViewMock
 
 
@@ -15,7 +14,7 @@ class TestMainWindowPresenter(unittest.TestCase):
         Config.parse(force_debug=True)
         self.view = MainViewMock()
         self.presenter = MainWindowPresenter(self.view)
-        self.repository = StatementFactory.create()
+        self.repository = StatementMock()
 
     def test_update_selected_date(self):
         with self.subTest("日付を変更できる"):
