@@ -12,11 +12,13 @@ from domain.valueobjects import Amount, StatementCreatedAt
 class StatementMock(IStatementRepository, metaclass=make_cls(abc.ABCMeta, Singleton)):
     def __init__(self):
         self._statements = []
+
+    def _generate_fake(self):
         today = datetime.date.today()
         y = today.year
         m = today.month
         d = today.day
-        created_at = "2000-09-03 12:13:14"
+        created_at = "1999-01-02 34:56:78"
         for _ in range(30):
             ai = random.randint(1, 20)
             am = random.randint(1, 25000)
@@ -25,7 +27,8 @@ class StatementMock(IStatementRepository, metaclass=make_cls(abc.ABCMeta, Single
                           amount=Amount(am), created_at=StatementCreatedAt(created_at))
             self._statements.append(s)
 
-    def get(self, year: int, month: int, day: int, account: Account or None) -> list[Statement]:
+    def get(self, year: int or None = None, month: int or None = None,
+            day: int or None = None, account: Account or None = None) -> list[Statement]:
         statement = [s for s in self._statements if s.year == year]
         if month is not None:
             statement = [s for s in statement if s.month == month]

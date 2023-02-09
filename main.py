@@ -12,10 +12,8 @@ def main():
 
     Config.parse()
 
-    if Config.ui_debug:
-        print("UI DEBUG MODE")
-    if Config.repository_debug:
-        print("REPOSITORY DEBUG MODE")
+    if Config.is_fake:
+        print("DEBUG MODE: using fake data")
 
     window = MainWindow()
     window.show()
