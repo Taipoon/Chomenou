@@ -7,6 +7,17 @@ class Amount(object):
     def __init__(self, amount: int):
         self._amount = amount
 
+    def __str__(self):
+        return str(self._amount)
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, Amount):
+            return False
+        return self.value == other.value
+
+    def __ne__(self, other) -> bool:
+        return not self.__eq__(other)
+
     @property
     def value(self) -> int:
         return self._amount
@@ -35,15 +46,3 @@ class StatementCreatedAt(object):
     @property
     def standard_format(self) -> str:
         return self.datetime.strftime("%Y年%m月%d日 %H時%M分%S秒")
-
-
-class FiscalYear(object):
-    def __init__(self, year: int):
-        self._year = year
-
-    def __str__(self):
-        return f"{self.year}年"
-
-    @property
-    def year(self) -> int:
-        return self._year

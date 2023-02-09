@@ -1,6 +1,6 @@
 import abc
-import datetime
-import random
+import csv
+import os.path
 
 from domain.entities import Account, Statement, AccountType
 from domain.helpers.metaclass_resolver import make_cls
@@ -13,18 +13,22 @@ class StatementMock(IStatementRepository, metaclass=make_cls(abc.ABCMeta, Single
     def __init__(self):
         self._statements = []
 
-    def _generate_fake(self):
-        today = datetime.date.today()
-        y = today.year
-        m = today.month
-        d = today.day
-        created_at = "1999-01-02 34:56:78"
-        for _ in range(30):
-            ai = random.randint(1, 20)
-            am = random.randint(1, 25000)
+    def generate_fake(self):
+        fake_path = os.path.join(os.path.dirname(__file__), "statements_fake.csv")
+        with open(fake_path, "r", encoding="utf-8") as f:
+            csv_reader = csv.DictReader(f)
 
-            s = Statement(year=y, month=m, day=d, account_id=ai,
-                          amount=Amount(am), created_at=StatementCreatedAt(created_at))
+        for row in csv_reader:
+            at = row.get("created_at")
+
+            s = Statement(
+                year=row.get("year"),
+                month=row.get("month"),
+                day=row.get("day"),
+                account_id=row.get("account_id"),
+                amount=Amount(int(row.get("amount"))),
+                created_at=StatementCreatedAt(at),
+            )
             self._statements.append(s)
 
     def get(self, year: int or None = None, month: int or None = None,
