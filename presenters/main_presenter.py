@@ -8,7 +8,7 @@ from domain.views import MainView
 from infrastructure.factories import StatementFactory
 
 
-class MainWindowPresenter(object):
+class MainPresenter(object):
     def __init__(self, view: MainView):
         self._accounts = Accounts()
         self._account_types = AccountTypes()

@@ -1,7 +1,7 @@
 import datetime
 import unittest
 
-from domain.presenters.main_window_presenter import MainWindowPresenter
+from presenters import MainWindowPresenter
 from domain.shared import Config
 from domain.staticvalues import Accounts
 from domain.valueobjects import Amount

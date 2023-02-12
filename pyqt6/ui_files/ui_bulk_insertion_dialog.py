@@ -7,10 +7,9 @@
 
 
 from PyQt6 import QtCore, QtGui, QtWidgets
-from PyQt6.QtWidgets import QDialog
 
 
-class Ui_BulkInsertionDialog(QDialog):
+class Ui_BulkInsertionDialog(QtWidgets.QDialog):
     def __init__(self):
         super().__init__()
         self.setupUi()
@@ -22,6 +21,7 @@ class Ui_BulkInsertionDialog(QDialog):
         self.setMaximumSize(QtCore.QSize(400, 300))
         self.buttonBox = QtWidgets.QDialogButtonBox(self)
         self.buttonBox.setGeometry(QtCore.QRect(20, 260, 261, 32))
+        self.buttonBox.setLayoutDirection(QtCore.Qt.LayoutDirection.LeftToRight)
         self.buttonBox.setOrientation(QtCore.Qt.Orientation.Horizontal)
         self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.StandardButton.Cancel|QtWidgets.QDialogButtonBox.StandardButton.Ok)
         self.buttonBox.setObjectName("buttonBox")
@@ -110,8 +110,9 @@ class Ui_BulkInsertionDialog(QDialog):
         self.dateEdit_dayInputSelector = QtWidgets.QDateEdit(self)
         self.dateEdit_dayInputSelector.setGeometry(QtCore.QRect(20, 160, 110, 40))
         font = QtGui.QFont()
-        font.setPointSize(14)
+        font.setPointSize(28)
         self.dateEdit_dayInputSelector.setFont(font)
+        self.dateEdit_dayInputSelector.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.dateEdit_dayInputSelector.setObjectName("dateEdit_dayInputSelector")
         self.lineEdit_amountEntryField = QtWidgets.QLineEdit(self)
         self.lineEdit_amountEntryField.setGeometry(QtCore.QRect(20, 210, 130, 40))
@@ -134,15 +135,18 @@ class Ui_BulkInsertionDialog(QDialog):
         self.pshBtn_registrationAction.setFont(font)
         self.pshBtn_registrationAction.setObjectName("pshBtn_registrationAction")
         self.cmbBx_accountSelector = QtWidgets.QComboBox(self)
-        self.cmbBx_accountSelector.setGeometry(QtCore.QRect(140, 160, 141, 41))
+        self.cmbBx_accountSelector.setGeometry(QtCore.QRect(140, 170, 141, 31))
         font = QtGui.QFont()
         font.setPointSize(14)
         self.cmbBx_accountSelector.setFont(font)
         self.cmbBx_accountSelector.setObjectName("cmbBx_accountSelector")
+        self._label = QtWidgets.QLabel(self)
+        self._label.setGeometry(QtCore.QRect(149, 150, 121, 20))
+        self._label.setObjectName("_label")
 
         self.retranslateUi()
-        # self.buttonBox.accepted.connect(self.accept) # type: ignore
-        # self.buttonBox.rejected.connect(self.reject) # type: ignore
+        self.buttonBox.accepted.connect(self.accept) # type: ignore
+        self.buttonBox.rejected.connect(self.reject) # type: ignore
         QtCore.QMetaObject.connectSlotsByName(self)
 
     def retranslateUi(self):
@@ -163,3 +167,4 @@ class Ui_BulkInsertionDialog(QDialog):
         self.dateEdit_dayInputSelector.setDisplayFormat(_translate("BulkInsertionDialog", "d日"))
         self._label_yen.setText(_translate("BulkInsertionDialog", "円"))
         self.pshBtn_registrationAction.setText(_translate("BulkInsertionDialog", "記帳"))
+        self._label.setText(_translate("BulkInsertionDialog", "科目を選択"))

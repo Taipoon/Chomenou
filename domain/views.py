@@ -94,4 +94,11 @@ class AccountsEditorView(AbstractBaseView):
 
 
 class BulkInsertionView(AbstractBaseView):
-    pass
+    @abc.abstractmethod
+    def update_line_edit(self, value: int):
+        """
+        一斉記帳する金額の入力欄を更新します
+        :param value: 金額
+        :return: None
+        """
+        pass

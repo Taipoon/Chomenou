@@ -4,12 +4,11 @@ from PyQt6.QtWidgets import QLineEdit, QMessageBox, QWidget
 from domain.entities import Account
 from domain.exceptions import AccountNotFoundException
 from domain.helpers.metaclass_resolver import make_cls
-from domain.presenters.account_editor_dialog_presenter import AccountsEditorDialogPresenter
 from domain.shared import Signal
 from domain.staticvalues import AccountTypes, Accounts
 from domain.valueobjects import Amount
 from domain.views import AccountsEditorView
-from infrastructure.factories import AccountFactory
+from presenters.accounts_editor_presenter import AccountsEditorPresenter
 from pyqt6.ui_files.ui_accounts_editor_dialog import Ui_AccountsEditorDialog
 
 
@@ -18,9 +17,7 @@ class AccountsEditorDialog(Ui_AccountsEditorDialog, AccountsEditorView, metaclas
         super().__init__()
         self._accounts = Accounts()
         self._account_types = AccountTypes()
-
-        self._account_repository = AccountFactory()
-        self._presenter = AccountsEditorDialogPresenter(view=self)
+        self._presenter = AccountsEditorPresenter(view=self)
 
     def initialize_ui(self):
         # テキスト入力欄を整数のみ入力可能にする
@@ -71,6 +68,8 @@ class AccountsEditorDialog(Ui_AccountsEditorDialog, AccountsEditorView, metaclas
 
             # 保存処理
             self._presenter.save(update_accounts=update_accounts)
+            # static value にも反映させる
+            self._accounts.reset()
 
         except ValueError as e:
             # raise InvalidAmountException
