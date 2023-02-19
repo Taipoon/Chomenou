@@ -174,8 +174,11 @@ class MainWindow(Ui_MainWindow, MainView, metaclass=make_cls()):
             bulk_insertion_dialog = BulkInsertionDialog()
             bulk_insertion_dialog.exec()
 
-    def _menu_tools_triggered(self):
-        pass
+    def _menu_tools_triggered(self, action: QAction):
+        """「ツール」メニューバーのアクション"""
+        if action is self.action_showStatistics:
+            pass
+
 
     def update_selected_account(self, account: Account):
         """現在選択されている勘定科目を表示します"""
