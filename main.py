@@ -11,7 +11,6 @@ def main():
     app = QApplication(sys.argv)
 
     Config.parse()
-
     if Config.is_fake:
         print("DEBUG MODE: using fake data")
 

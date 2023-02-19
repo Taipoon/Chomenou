@@ -91,6 +91,20 @@ class StatementSQLite(SQLiteBase, IStatementRepository):
     def __init__(self):
         super().__init__()
 
+    def get_all_years(self) -> list[int]:
+        sql = f"SELECT `year` FROM `statements` GROUP BY `year` ORDER BY `year`"
+
+        years = []
+        cursor = self.conn.cursor()
+        try:
+            cursor.execute(sql)
+            for row in cursor:
+                year = row[0]
+                years.append(year)
+        finally:
+            cursor.close()
+            return years
+
     def get(self, year: int = None, month: int = None, day: int = None,
             account: Account or None = None) -> list[Statement]:
 
