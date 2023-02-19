@@ -1,15 +1,16 @@
 from PyQt6.QtCore import QDate
 from PyQt6.QtGui import QIntValidator, QIcon, QAction
-from PyQt6.QtWidgets import QTableWidgetItem, QTreeWidgetItem, QErrorMessage, QPushButton, QWidget, QDialog
+from PyQt6.QtWidgets import QTableWidgetItem, QTreeWidgetItem, QErrorMessage, QPushButton
 
-from domain.entities import Account, Statement
+from domain.entities import Account, Statement, MonthlyAccountSummary
 from domain.exceptions import InvalidAmountException
 from domain.helpers.metaclass_resolver import make_cls
-from domain.presenters.main_window_presenter import MainWindowPresenter, MonthlyAccountSummary
 from domain.staticvalues import Accounts, AccountTypes
 from domain.views import MainView
 from infrastructure.factories import StatementFactory, AccountFactory
-from pyqt6.factories import AccountsEditorFactory
+from presenters.main_presenter import MainPresenter
+from pyqt6.accounts_editor_dialog import AccountsEditorDialog
+from pyqt6.bulk_insertion_dialog import BulkInsertionDialog
 from pyqt6.ui_files.ui_main_window import Ui_MainWindow
 
 
@@ -23,7 +24,7 @@ class MainWindow(Ui_MainWindow, MainView, metaclass=make_cls()):
         self._statement_repository = StatementFactory.create()
         self._account_repository = AccountFactory.create()
 
-        self._presenter = MainWindowPresenter(view=self)
+        self._presenter = MainPresenter(view=self)
 
     def initialize_ui(self):
         # ウィンドウアイコンを設定
@@ -164,8 +165,14 @@ class MainWindow(Ui_MainWindow, MainView, metaclass=make_cls()):
     def _menu_edit_triggered(self, action: QAction):
         """「編集」メニューバーのアクション"""
         if action is self.action_editAccounts:
-            accounts_editor_dialog = AccountsEditorFactory.create()
+            # 勘定科目編集ダイアログ
+            accounts_editor_dialog = AccountsEditorDialog()
             accounts_editor_dialog.exec()
+
+        elif action is self.action_bulkInsertion:
+            # 月を指定して一括記帳
+            bulk_insertion_dialog = BulkInsertionDialog()
+            bulk_insertion_dialog.exec()
 
     def _menu_tools_triggered(self):
         pass

@@ -13,6 +13,9 @@ class StatementMock(IStatementRepository, metaclass=make_cls(abc.ABCMeta, Single
     def __init__(self):
         self._statements = []
 
+    def get_all_years(self) -> list[int]:
+        return [2018, 2019, 2020, 2021, 2022, 2023]
+
     def generate_fake(self):
         fake_path = os.path.join(os.path.dirname(__file__), "statements_fake.csv")
         with open(fake_path, "r", encoding="utf-8") as f:

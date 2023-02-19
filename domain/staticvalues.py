@@ -56,3 +56,6 @@ class Accounts(metaclass=Singleton):
             if account.name_hepburn == hepburn:
                 return account
         raise AccountNotFoundException
+
+    def reset(self):
+        self._accounts = self._account_repository.all()

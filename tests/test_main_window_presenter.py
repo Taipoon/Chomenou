@@ -1,7 +1,7 @@
 import datetime
 import unittest
 
-from domain.presenters.main_window_presenter import MainWindowPresenter
+from presenters.main_presenter import MainPresenter
 from domain.shared import Config
 from domain.staticvalues import Accounts
 from domain.valueobjects import Amount
@@ -13,7 +13,7 @@ class TestMainWindowPresenter(unittest.TestCase):
     def setUp(self) -> None:
         Config.parse(force_debug=True)
         self.view = MainViewMock()
-        self.presenter = MainWindowPresenter(self.view)
+        self.presenter = MainPresenter(self.view)
         self.repository = StatementMock()
 
     def test_update_selected_date(self):

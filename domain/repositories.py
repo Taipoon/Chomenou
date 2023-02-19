@@ -35,6 +35,14 @@ class IAccountRepository(abc.ABC):
 
 class IStatementRepository(abc.ABC):
     @abc.abstractmethod
+    def get_all_years(self) -> list[int]:
+        """
+        記帳データがあるすべての年度を取得します
+        :return: 年度
+        """
+        raise NotImplementedError
+
+    @abc.abstractmethod
     def get(self, year: int or None = None, month: int or None = None,
             day: int or None = None, account: Account or None = None) -> list[Statement]:
         """

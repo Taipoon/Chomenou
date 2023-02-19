@@ -3,7 +3,7 @@ from domain.views import AccountsEditorView
 from infrastructure.factories import AccountFactory
 
 
-class AccountsEditorDialogPresenter(object):
+class AccountsEditorPresenter(object):
     def __init__(self, view: AccountsEditorView):
         self._account_repository = AccountFactory.create()
 
