@@ -179,7 +179,6 @@ class MainWindow(Ui_MainWindow, MainView, metaclass=make_cls()):
         if action is self.action_showStatistics:
             pass
 
-
     def update_selected_account(self, account: Account):
         """現在選択されている勘定科目を表示します"""
         self.label_selectedAccount.setText(account.name)

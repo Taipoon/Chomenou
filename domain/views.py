@@ -15,6 +15,9 @@ class AbstractBaseView(abc.ABC):
 
 
 class MainView(AbstractBaseView):
+    """
+    主に記帳を行う、メインのビュー
+    """
     @abc.abstractmethod
     def update_selected_account(self, account: Account):
         """
@@ -83,6 +86,9 @@ class MainView(AbstractBaseView):
 
 
 class AccountsEditorView(AbstractBaseView):
+    """
+    勘定科目の編集を担うビュー
+    """
     @abc.abstractmethod
     def update_line_edit(self, account: Account, amount: Amount):
         """
@@ -95,6 +101,9 @@ class AccountsEditorView(AbstractBaseView):
 
 
 class BulkInsertionView(AbstractBaseView):
+    """
+    一括記帳機能を担うビュー
+    """
     @abc.abstractmethod
     def set_day_input_selector_max_range(self, max_day: int):
         """
@@ -118,7 +127,7 @@ class BulkInsertionView(AbstractBaseView):
         """
         年度の選択ボックスを更新します
         :param years: 年度のリスト
-        :return:
+        :return: None
         """
         raise NotImplementedError
 
@@ -127,6 +136,20 @@ class BulkInsertionView(AbstractBaseView):
         """
         勘定科目選択ボックスを更新します
         :param accounts: 勘定科目のリスト
-        :return:
+        :return: None
+        """
+        raise NotImplementedError
+
+
+class StatisticsView(AbstractBaseView):
+    """
+    統計情報を表示するビュー
+    """
+    @abc.abstractmethod
+    def update_accounts_summary_bar_chart(self, summary: dict[Account: list[Statement]]):
+        """
+        勘定科目タイプの合計値と、各々の勘定科目を表示する棒グラフを更新します
+        :param summary: 棒グラフとして表示するデータ
+        :return: None
         """
         raise NotImplementedError

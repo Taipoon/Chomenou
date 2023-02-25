@@ -88,6 +88,17 @@ class IStatementRepository(abc.ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
+    def get_yearly_account_summary(self, year: int, account: Account) -> Statement or None:
+        """
+        引数で指定した年の、勘定科目ごとの合計金額を取得します。
+        0件の場合は空の明細リストを返します。
+        :param year: 年
+        :param account: 勘定科目
+        :return: 明細
+        """
+        raise NotImplementedError
+
+    @abc.abstractmethod
     def get_details_summary_by_accounts(self, year: int, month: int, account: Account) -> list[Statement]:
         """
         引数で指定した年・月・勘定科目の、日別の合計金額を取得します。

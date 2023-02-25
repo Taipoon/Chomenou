@@ -196,6 +196,25 @@ class StatementSQLite(SQLiteBase, IStatementRepository):
             cursor.close()
             return statements
 
+    def get_yearly_account_summary(self, year: int, account: Account) -> Statement or None:
+        sql = f"SELECT `year`, `account_id`, SUM(`amount`) AS `total` " \
+              f"FROM `statements`" \
+              f"WHERE `year` = {year} AND `account_id` = {account.id} " \
+              f"LIMIT 1"
+        cursor = self.conn.cursor()
+        statement = None
+        try:
+            cursor.execute(sql)
+            for row in cursor:
+                year, account_id, total = row
+                if year is not None:
+                    statement = Statement(year=year, month=0, day=0,
+                                          account_id=account_id, amount=Amount(total),
+                                          created_at=None)
+        finally:
+            cursor.close()
+            return statement
+
     def get_details_summary_by_accounts(self, year: int, month: int, account: Account) -> list[Statement]:
         sql = f"SELECT `year`, `month`, `day`, `account_id`, " \
               f"SUM(`amount`) AS `total`, MAX(`created_at`) AS `updated_at` " \
