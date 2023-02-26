@@ -6,6 +6,7 @@ from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton
 
 from domain.entities import Statement, Account
 from domain.helpers.metaclass_resolver import make_cls
+from domain.shared import Config
 from domain.views import StatisticsView
 from presenters.statistics_presenter import StatisticsPresenter
 
@@ -43,7 +44,7 @@ class StatisticsWindow(QWidget, StatisticsView, metaclass=make_cls()):
         """
         # グラフの作成
         chart = QChart()
-        chart.setTitle("勘定科目別 集計")
+        chart.setTitle(f"{self._current_year}年度 勘定科目別 集計")
         chart.legend().setVisible(False)
 
         # X軸(勘定科目名をカテゴリとして設定)
@@ -113,7 +114,8 @@ def calculate_max_range_value(max_value: int):
 
 
 if __name__ == '__main__':
+    Config.parse()
     app = QApplication(sys.argv)
-    dialog = StatisticsWindow(2020)
+    dialog = StatisticsWindow(2025)
     dialog.show()
     sys.exit(app.exec())

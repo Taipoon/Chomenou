@@ -31,4 +31,4 @@ def create_dummy_sql(table_name: str, input_file: str, output_file: str, cleanup
 
 
 if __name__ == '__main__':
-    create_dummy_sql("statements", "statements_fake.csv", "dummy_statements.sql", cleanup=True)
+    create_dummy_sql("statements", "../infrastructure/mock/statements_fake.csv", "dummy_statements.sql", cleanup=True)

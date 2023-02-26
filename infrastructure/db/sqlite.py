@@ -7,7 +7,7 @@ from domain.valueobjects import StatementCreatedAt, Amount
 
 
 class SQLiteBase(object):
-    def __init__(self, path: str = os.path.join(os.path.dirname(__file__), "db", "taipoon.db")):
+    def __init__(self, path: str = os.path.join(os.path.dirname(__file__), "", "taipoon.db")):
         self._path = path
         self.conn: sqlite3.Connection or None = None
         self._connect()

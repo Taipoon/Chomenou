@@ -17,22 +17,26 @@ class StatementMock(IStatementRepository, metaclass=make_cls(abc.ABCMeta, Single
         return [2018, 2019, 2020, 2021, 2022, 2023]
 
     def generate_fake(self):
+        """
+        予めいくつかのダミーデータを登録しておきたい場合に呼び出します。
+
+        """
         fake_path = os.path.join(os.path.dirname(__file__), "statements_fake.csv")
         with open(fake_path, "r", encoding="utf-8") as f:
             csv_reader = csv.DictReader(f)
 
-        for row in csv_reader:
-            at = row.get("created_at")
+            for row in csv_reader:
+                at = row.get("created_at")
 
-            s = Statement(
-                year=row.get("year"),
-                month=row.get("month"),
-                day=row.get("day"),
-                account_id=row.get("account_id"),
-                amount=Amount(int(row.get("amount"))),
-                created_at=StatementCreatedAt(at),
-            )
-            self._statements.append(s)
+                s = Statement(
+                    year=int(row.get("year")),
+                    month=int(row.get("month")),
+                    day=int(row.get("day")),
+                    account_id=int(row.get("account_id")),
+                    amount=Amount(int(row.get("amount"))),
+                    created_at=StatementCreatedAt(at),
+                )
+                self._statements.append(s)
 
     def get(self, year: int or None = None, month: int or None = None,
             day: int or None = None, account: Account or None = None) -> list[Statement]:
@@ -70,6 +74,13 @@ class StatementMock(IStatementRepository, metaclass=make_cls(abc.ABCMeta, Single
             monthly_summary.append(Statement(year=year, month=month, day=0,
                                              account_id=account_id, amount=Amount(total)))
         return sorted(monthly_summary, key=lambda s: s.account_id)
+
+    def get_yearly_account_summary(self, year: int, account: Account) -> Statement or None:
+        filtered = [s.amount.value for s in self._statements if s.year == year and s.account_id == account.id]
+        s = Statement(year=year, month=0, day=0,
+                      account_id=account.id, amount=Amount(sum(filtered)),
+                      created_at=None)
+        return s
 
     def get_details_summary_by_accounts(self, year: int, month: int, account: Account) -> list[Statement]:
         s = [s for s in self._statements if s.account_id == account.id and s.year == year and s.month == month]

@@ -5,7 +5,7 @@ from presenters.main_presenter import MainPresenter
 from domain.shared import Config
 from domain.staticvalues import Accounts
 from domain.valueobjects import Amount
-from infrastructure.mock import StatementMock
+from infrastructure.mock.mock import StatementMock
 from pyqt6.mock import MainViewMock
 
 
@@ -49,8 +49,6 @@ class TestMainWindowPresenter(unittest.TestCase):
 
             # 挿入されたデータを確認
             statements = self.repository.get(year=2000)
-            for s in statements:
-                print(s)
 
             # データは1件登録されているはず
             self.assertEqual(1, len(statements))
