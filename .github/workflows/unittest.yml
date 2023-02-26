@@ -1,8 +1,15 @@
 name: chomenou-unit-test-python
-on: [push]
+on:
+  push:
+    branches:
+      - main
+      - feature/**
+  workflow_dispatch:
+
 jobs:
-  check-bats-version:
-    runs-in: ubuntu-latest
+  python-unit-test:
+    runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2
