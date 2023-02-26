@@ -11,7 +11,7 @@ from pyqt6.mock import MainViewMock
 
 class TestMainWindowPresenter(unittest.TestCase):
     def setUp(self) -> None:
-        Config.parse(force_debug=True)
+        Config.parse(force_debug=True, dotenv_path=".env.test")
         self.view = MainViewMock()
         self.presenter = MainPresenter(self.view)
         self.repository = StatementMock()
