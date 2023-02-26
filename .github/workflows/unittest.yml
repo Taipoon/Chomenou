@@ -25,4 +25,4 @@ jobs:
           python -m pip install -r requirements.txt
 
       - name: Run Unit test
-        run: python -m unittest -v tests/**/*.py
+        run: python -m unittest -v tests/test*.py
