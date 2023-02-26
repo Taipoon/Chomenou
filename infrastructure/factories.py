@@ -1,7 +1,7 @@
 from domain.repositories import IAccountTypeRepository, IAccountRepository, IStatementRepository
 from domain.shared import Config, Singleton
-from infrastructure.mock import AccountTypeMock, AccountMock, StatementMock
-from infrastructure.sqlite import AccountTypeSQLite, AccountSQLite, StatementSQLite
+from infrastructure.mock.mock import AccountTypeMock, AccountMock, StatementMock
+from infrastructure.db.sqlite import AccountTypeSQLite, AccountSQLite, StatementSQLite
 
 
 class AccountTypeFactory(metaclass=Singleton):
