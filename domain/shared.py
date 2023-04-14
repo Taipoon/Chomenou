@@ -12,6 +12,7 @@ class Singleton(type):
         return cls._instances[cls]
 
 
+# TODO: .ini ファイルに変更 configparser を用いる
 class Config(metaclass=Singleton):
     is_fake = None
     sqlite_path = None
@@ -24,7 +25,7 @@ class Config(metaclass=Singleton):
             envs = dotenv.dotenv_values(dotenv_path=dotenv_path)
             # use fake data
             cls.is_fake = envs.get("IS_FAKE").lower() == "true" or force_debug
-            # path to sqlite database
+            # path to sqlite database for production
             cls.sqlite_path = envs.get("SQLITE_PATH")
             # path to output files
             cls.output_excel_filepath = envs.get("OUTPUT_EXCEL_FILENAME")

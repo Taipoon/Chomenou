@@ -3,10 +3,11 @@ import csv
 import os.path
 
 from domain.entities import Account, Statement, AccountType
+from domain.exceptions import AccountNotFoundException
 from domain.helpers.metaclass_resolver import make_cls
 from domain.repositories import IStatementRepository, IAccountTypeRepository, IAccountRepository
 from domain.shared import Singleton
-from domain.valueobjects import Amount, StatementCreatedAt
+from domain.valueobjects import Amount
 
 
 class StatementMock(IStatementRepository, metaclass=make_cls(abc.ABCMeta, Singleton)):
@@ -33,8 +34,7 @@ class StatementMock(IStatementRepository, metaclass=make_cls(abc.ABCMeta, Single
                     month=int(row.get("month")),
                     day=int(row.get("day")),
                     account_id=int(row.get("account_id")),
-                    amount=Amount(int(row.get("amount"))),
-                    created_at=StatementCreatedAt(at),
+                    amount=Amount(int(row.get("amount")))
                 )
                 self._statements.append(s)
 
@@ -75,14 +75,13 @@ class StatementMock(IStatementRepository, metaclass=make_cls(abc.ABCMeta, Single
                                              account_id=account_id, amount=Amount(total)))
         return sorted(monthly_summary, key=lambda s: s.account_id)
 
-    def get_yearly_account_summary(self, year: int, account: Account) -> Statement or None:
-        filtered = [s.amount.value for s in self._statements if s.year == year and s.account_id == account.id]
+    def get_yearly_account_summary(self, year: int) -> Statement or None:
+        filtered = [s.amount.value for s in self._statements if s.year == year]
         s = Statement(year=year, month=0, day=0,
-                      account_id=account.id, amount=Amount(sum(filtered)),
-                      created_at=None)
+                      account_id=account.id, amount=Amount(sum(filtered)))
         return s
 
-    def get_details_summary_by_accounts(self, year: int, month: int, account: Account) -> list[Statement]:
+    def get_daily_total_by_account_and_month_and_year(self, year: int, month: int, account: Account) -> list[Statement]:
         s = [s for s in self._statements if s.account_id == account.id and s.year == year and s.month == month]
         return s
 
@@ -145,8 +144,14 @@ class AccountMock(IAccountRepository, metaclass=make_cls(abc.ABCMeta, Singleton)
     def all(self) -> list[Account]:
         return self._accounts
 
-    def update_account(self, account_id: int, account: Account):
+    def find_by_id(self, account_id: int) -> Account:
+        for a in self._accounts:
+            if a.id == account_id:
+                return a
+        raise AccountNotFoundException
+
+    def update_account(self, account_id: int, new_account: Account):
         for i, a in enumerate(self._accounts):
             if a.id == account_id:
-                self._accounts[i] = account
+                self._accounts[i] = new_account
                 return

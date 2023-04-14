@@ -2,8 +2,8 @@ import datetime
 
 from domain.entities import Statement, Account, MonthlyAccountSummary
 from domain.exceptions import InvalidAmountException
-from domain.staticvalues import AccountTypes, Accounts
-from domain.valueobjects import Amount, StatementCreatedAt
+from domain.staticvalues import Accounts, AccountTypes
+from domain.valueobjects import Amount
 from domain.views import MainView
 from infrastructure.factories import StatementFactory
 
@@ -11,6 +11,7 @@ from infrastructure.factories import StatementFactory
 class MainPresenter(object):
     def __init__(self, view: MainView):
         self._accounts = Accounts()
+
         self._account_types = AccountTypes()
 
         self._statement_repository = StatementFactory.create()
@@ -49,8 +50,7 @@ class MainPresenter(object):
             now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
             statement = Statement(year=year, month=month, day=day,
-                                  account_id=account.id, amount=amount,
-                                  created_at=StatementCreatedAt(now))
+                                  account_id=account.id, amount=amount)
             # データを新規登録する
             self._statement_repository.insert(statement=statement)
             # 入力欄をクリア
@@ -79,7 +79,7 @@ class MainPresenter(object):
             account = self._accounts.get_account_by_id(statement.account_id)
             if account is None:
                 continue
-            details = self._statement_repository.get_details_summary_by_accounts(year, month, account)
+            details = self._statement_repository.get_daily_total_by_account_and_month_and_year(year, month, account)
 
             summary = MonthlyAccountSummary(account=account,
                                             total_amount=statement.amount,

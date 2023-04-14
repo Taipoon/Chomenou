@@ -5,7 +5,6 @@ from domain.entities import Account
 from domain.exceptions import AccountNotFoundException
 from domain.helpers.metaclass_resolver import make_cls
 from domain.shared import Signal
-from domain.staticvalues import AccountTypes, Accounts
 from domain.valueobjects import Amount
 from domain.views import AccountsEditorView
 from presenters.accounts_editor_presenter import AccountsEditorPresenter

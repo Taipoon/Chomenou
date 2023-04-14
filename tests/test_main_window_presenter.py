@@ -1,15 +1,16 @@
 import datetime
 import unittest
 
-from presenters.main_presenter import MainPresenter
 from domain.shared import Config
 from domain.staticvalues import Accounts
 from domain.valueobjects import Amount
 from infrastructure.mock.mock import StatementMock
+from presenters.main_presenter import MainPresenter
 from pyqt6.mock import MainViewMock
 
 
 class TestMainWindowPresenter(unittest.TestCase):
+    # TODO: テストメソッドを日本語にする
     def setUp(self) -> None:
         Config.parse(force_debug=True, dotenv_path=".env.test")
         self.view = MainViewMock()

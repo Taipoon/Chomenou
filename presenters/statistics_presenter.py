@@ -17,7 +17,7 @@ class StatisticsPresenter(object):
 
         statement_summary = {}
         for account in accounts:
-            statements = self._statement_repository.get_yearly_account_summary(year=year, account=account)
+            statements = self._statement_repository.get_yearly_account_summary(year=year)
             statement_summary[account] = statements
 
         self._view.update_accounts_summary_bar_chart(summary=statement_summary)

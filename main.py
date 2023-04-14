@@ -1,6 +1,6 @@
 import sys
 
-from PyQt6.QtWidgets import QApplication
+from PyQt6.QtWidgets import QApplication, Q
 
 from domain.shared import Config
 from pyqt6.main_window import MainWindow

@@ -1,31 +1,33 @@
-metadic = {}
+meta_dict = {}
 
 
-def _generatemetaclass(bases, metas, priority):
-    trivial = lambda m: sum([issubclass(M, m) for M in metas], m is type)
-    # hackish!! m is trivial if it is 'type' or, in the case explicit
-    # metaclasses are given, if it is a superclass of at least one of them
-    metabs = tuple([mb for mb in map(type, bases) if not trivial(mb)])
-    metabases = (metabs + metas, metas + metabs)[priority]
-    if metabases in metadic:  # already generated metaclass
-        return metadic[metabases]
-    elif not metabases:  # trivial metabase
+def _generate_metaclass(bases, metas, priority):
+    t = lambda m: sum([issubclass(M, m) for M in metas], m is type)
+
+    meta_bs = tuple([mb for mb in map(type, bases) if not t(mb)])
+
+    meta_bases = (meta_bs + metas, metas + meta_bs)[priority]
+
+    if meta_bases in meta_dict:
+        # already generated metaclass
+        return meta_dict[meta_bases]
+
+    elif not meta_bases:
+        # trivial metabase
         meta = type
-    elif len(metabases) == 1:  # single metabase
-        meta = metabases[0]
-    else:  # multiple metabases
-        metaname = "_" + ''.join([m.__name__ for m in metabases])
-        meta = make_cls()(metaname, metabases, {})
-    return metadic.setdefault(metabases, meta)
+
+    elif len(meta_bases) == 1:
+        # single metabase
+        meta = meta_bases[0]
+
+    else:
+        # multiple meta_bases
+        metaname = "_" + ''.join([m.__name__ for m in meta_bases])
+        meta = make_cls()(metaname, meta_bases, {})
+
+    return meta_dict.setdefault(meta_bases, meta)
 
 
 def make_cls(*metas, **options):
-    """Class factory avoiding metatype conflicts. The invocation syntax is
-    makecls(M1,M2,..,priority=1)(name,bases,dic). If the base classes have
-    metaclasses conflicting within themselves or with the given metaclasses,
-    it automatically generates a compatible metaclass and instantiate it.
-    If priority is True, the given metaclasses have priority over the
-    bases' metaclasses"""
-
-    priority = options.get('priority', False)  # default, no priority
-    return lambda n, b, d: _generatemetaclass(b, metas, priority)(n, b, d)
+    priority = options.get('priority', False)
+    return lambda n, b, d: _generate_metaclass(b, metas, priority)(n, b, d)
