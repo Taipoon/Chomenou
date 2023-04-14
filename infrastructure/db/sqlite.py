@@ -9,7 +9,7 @@ from domain.valueobjects import Amount
 
 class SQLiteBase(object):
     def __init__(self):
-        self._path = Config.sqlite_path
+        self._path = Config.sqlite_filepath
         self.conn: sqlite3.Connection or None = None
         self._connect()
 

@@ -13,8 +13,8 @@ DUMMY_CSV_FILES = [
     "statements.csv",
 ]
 
-Config.parse()
-db_path = Config.sqlite_path
+Config.parse("../config.ini")
+db_path = Config.sqlite_filepath
 testdb = TestDB(db_path=db_path, dummy_csv_files=DUMMY_CSV_FILES)
 
 

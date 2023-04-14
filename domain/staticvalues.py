@@ -1,12 +1,11 @@
 from domain.exceptions import AccountTypeNotFoundException, AccountNotFoundException
-from domain.repositories import IAccountTypeRepository, IAccountRepository
 from domain.shared import Singleton
 from infrastructure.factories import AccountTypeFactory, AccountFactory
 
 
 class AccountTypes(metaclass=Singleton):
-    def __init__(self, account_type_repository: IAccountTypeRepository = AccountTypeFactory.create()):
-        self._account_type_repository = account_type_repository
+    def __init__(self):
+        self._account_type_repository = AccountTypeFactory.create()
         self._account_types = []
         self._initialize()
 
@@ -24,8 +23,8 @@ class AccountTypes(metaclass=Singleton):
 
 
 class Accounts(metaclass=Singleton):
-    def __init__(self, account_repository: IAccountRepository = AccountFactory.create()):
-        self._account_repository = account_repository
+    def __init__(self):
+        self._account_repository = AccountFactory.create()
         self._accounts = []
         self._initialize()
 
