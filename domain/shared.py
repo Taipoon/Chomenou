@@ -25,6 +25,7 @@ class Config(metaclass=Singleton):
         try:
             parser = configparser.ConfigParser()
             parser.read(ini_filepath, encoding="utf-8")
+
             envs = parser[section]
             # fake data
             cls.debug = envs.get("DEBUG").lower() == "true" or force_debug

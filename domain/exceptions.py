@@ -24,4 +24,3 @@ class AccountNotFoundException(Exception):
     存在しない勘定科目へのアクセスで送出されます。
     """
     pass
-

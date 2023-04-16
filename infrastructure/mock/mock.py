@@ -13,6 +13,7 @@ from domain.valueobjects import Amount
 class StatementMock(IStatementRepository, metaclass=make_cls(abc.ABCMeta, Singleton)):
     def __init__(self):
         self._statements = []
+        self.generate_fake()
 
     def get_all_years(self) -> list[int]:
         return [2018, 2019, 2020, 2021, 2022, 2023]

@@ -113,7 +113,7 @@ def calculate_max_range_value(max_value: int):
 
 
 if __name__ == '__main__':
-    Config.parse()
+    Config.parse("../config.ini")
     app = QApplication(sys.argv)
     dialog = StatisticsWindow(2025)
     dialog.show()

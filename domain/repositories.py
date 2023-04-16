@@ -1,6 +1,10 @@
-import abc
+from __future__ import annotations
 
-from domain.entities import AccountType, Account, Statement
+import abc
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from domain.entities import AccountType, Account, Statement
 
 
 class IAccountTypeRepository(abc.ABC):
