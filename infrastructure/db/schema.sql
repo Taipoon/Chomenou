@@ -27,12 +27,12 @@ CREATE TABLE IF NOT EXISTS `accounts` (
 
 
 CREATE TABLE IF NOT EXISTS `statements` (
-    `id` INTEGER PRIMARY KEY AUTOINCREMENT ,
     `year` INTEGER NOT NULL ,
     `month` INTEGER NOT NULL ,
     `day` INTEGER NOT NULL ,
     `account_id` INTEGER NOT NULL ,
     `amount` INTEGER NOT NULL ,
     `created_at` TEXT NOT NULL DEFAULT (DATETIME('now', 'localtime')) ,
+    PRIMARY KEY ('year', 'month', 'day', 'account_id') ,
     FOREIGN KEY (`account_id`) REFERENCES `accounts`(`id`)
 );
