@@ -124,36 +124,3 @@ class Statement(object):
     def amount(self) -> Amount:
         """金額"""
         return self._amount
-
-
-class MonthlyAccountSummary(object):
-    def __init__(self, account: Account, total_amount: Amount, details: list[Statement]):
-        self._id = account.id
-        self._account = account
-        self._total_amount = total_amount
-        self._details = details
-
-    @property
-    def id(self) -> int:
-        return self._id
-
-    @property
-    def account(self):
-        return self._account
-
-    @property
-    def details(self):
-        return self._details
-
-    @property
-    def total_amount(self) -> Amount:
-        return self._total_amount
-
-
-class ExportDataTransferObject(object):
-    # TODO: 集約として年度ごとの書き出すサマリオブジェクトを設計すること
-    def __init__(self, year: int, month: int, account_name: str, total: Amount):
-        self._year = year
-        self._month = month
-        self._account_name = account_name
-        self._total = total

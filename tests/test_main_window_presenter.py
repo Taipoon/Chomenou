@@ -4,7 +4,7 @@ import unittest
 from domain.shared import Config
 from domain.staticvalues import Accounts
 from domain.valueobjects import Amount
-from infrastructure.mock.mock import StatementMock
+from infrastructure.mock.sqlite import StatementMock
 from presenters.main_presenter import MainPresenter
 from pyqt6.mock import MainViewMock
 
