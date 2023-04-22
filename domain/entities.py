@@ -95,6 +95,19 @@ class Statement(object):
 
         self._amount = amount
 
+    def __eq__(self, other):
+        if isinstance(other, Statement):
+            return all([
+                self._year == other.year,
+                self._month == other.month,
+                self._day == other.day,
+                self._account_id == other.account_id,
+                ])
+        return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     @property
     def year(self) -> int:
         """年"""
