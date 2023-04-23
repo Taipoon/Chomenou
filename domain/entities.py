@@ -88,10 +88,7 @@ class Statement(object):
         self._year = year
         self._month = month
         self._day = day
-
-        # account = Accounts().get_account_by_id(account_id)
         self._account_id = account_id
-
         self._amount = amount
 
     def __eq__(self, other):

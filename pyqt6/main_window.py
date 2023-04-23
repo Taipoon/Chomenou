@@ -1,17 +1,11 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
-
 from PyQt6.QtCore import QDate
 from PyQt6.QtGui import QIntValidator, QIcon, QAction
 from PyQt6.QtWidgets import QTableWidgetItem, QTreeWidgetItem, QErrorMessage, QPushButton
 
-if TYPE_CHECKING:
-    from domain.entities import Account, Statement
-
+from domain.entities import Account, Statement
 from domain.exceptions import InvalidAmountException
 from domain.helpers.metaclass_resolver import make_cls
-from domain.staticvalues import Accounts
+from domain.staticvalues import AccountList
 from domain.views import MainView
 from infrastructure.factories import StatementFactory, AccountFactory
 from presenters.main_presenter import MainPresenter
@@ -23,7 +17,7 @@ from pyqt6.ui_files.ui_main_window import Ui_MainWindow
 class MainWindow(Ui_MainWindow, MainView, metaclass=make_cls()):
     def __init__(self):
         super().__init__()
-        self._accounts = Accounts()
+        self._accounts = AccountList()
         self._statement_repository = StatementFactory.create()
         self._account_repository = AccountFactory.create()
 

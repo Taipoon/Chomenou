@@ -2,7 +2,7 @@ import datetime
 import unittest
 
 from domain.shared import Config
-from domain.staticvalues import Accounts
+from domain.staticvalues import AccountList
 from domain.valueobjects import Amount
 from infrastructure.mock.sqlite import StatementMock
 from presenters.main_presenter import MainPresenter
@@ -45,7 +45,7 @@ class TestMainWindowPresenter(unittest.TestCase):
     def test_execute_registration(self):
         with self.subTest("記帳アクションを実行できる"):
 
-            shiire = Accounts().get_account_by_name("仕入")
+            shiire = AccountList().get_account_by_name("仕入")
             self.presenter.execute_registration(2000, 9, 3, "3000", shiire)
 
             # 挿入されたデータを確認

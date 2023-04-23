@@ -3,7 +3,7 @@ from domain.shared import Singleton
 from infrastructure.factories import AccountTypeFactory, AccountFactory
 
 
-class AccountTypes(metaclass=Singleton):
+class AccountTypeList(metaclass=Singleton):
     def __init__(self):
         self._account_type_repository = AccountTypeFactory.create()
         self._account_types = []
@@ -22,7 +22,7 @@ class AccountTypes(metaclass=Singleton):
         raise AccountTypeNotFoundException
 
 
-class Accounts(metaclass=Singleton):
+class AccountList(metaclass=Singleton):
     def __init__(self):
         self._account_repository = AccountFactory.create()
         self._accounts = []

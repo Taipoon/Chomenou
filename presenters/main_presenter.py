@@ -2,7 +2,7 @@ import datetime
 
 from domain.entities import Statement, Account
 from domain.exceptions import InvalidAmountException
-from domain.staticvalues import Accounts, AccountTypes
+from domain.staticvalues import AccountList, AccountTypeList
 from domain.valueobjects import Amount
 from domain.views import MainView
 from infrastructure.factories import StatementFactory
@@ -10,9 +10,9 @@ from infrastructure.factories import StatementFactory
 
 class MainPresenter(object):
     def __init__(self, view: MainView):
-        self._accounts = Accounts()
+        self._accounts = AccountList()
 
-        self._account_types = AccountTypes()
+        self._account_types = AccountTypeList()
 
         self._statement_repository = StatementFactory.create()
 
