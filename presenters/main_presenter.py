@@ -52,7 +52,7 @@ class MainPresenter(object):
             statement = Statement(year=year, month=month, day=day,
                                   account_id=account.id, amount=amount)
             # データを新規登録する
-            self._statement_repository.insert(statement=statement)
+            self._statement_repository.upsert(statement=statement)
             # 入力欄をクリア
             self._view.clear_amount_entry_field()
             # サマリの更新
@@ -67,27 +67,13 @@ class MainPresenter(object):
 
     def _update_daily_summary_viewer(self, year: int, month: int, day: int):
         """日別サマリの更新"""
-        statements = self._statement_repository.get_daily_account_summary(year=year, month=month, day=day)
+        statements = self._statement_repository.get(year=year, month=month, day=day)
         self._view.update_daily_summary_viewer(statements)
 
     def _update_monthly_summary_viewer(self, year: int, month: int):
         """月別サマリの更新"""
-        summary_results = []
-
-        statements = self._statement_repository.get_monthly_account_summary(year=year, month=month)
-        for statement in statements:
-            account = self._accounts.get_account_by_id(statement.account_id)
-            if account is None:
-                continue
-            details = self._statement_repository.get_daily_total_by_account_and_month_and_year(year, month, account)
-        """
-            summary = MonthlyAccountSummary(account=account,
-                                            total_amount=statement.amount,
-                                            details=details)
-            summary_results.append(summary)
-
-        self._view.update_monthly_summary_viewer(summary_results)
-        """
+        monthly_summary = self._statement_repository.get_monthly_statement_summary(year=year, month=month)
+        self._view.update_monthly_summary_viewer(monthly_summary)
 
     def _is_date_changed(self, year: int, month: int, day: int) -> bool:
         return self._selected_year == year and self._selected_month == month and self._selected_day == day

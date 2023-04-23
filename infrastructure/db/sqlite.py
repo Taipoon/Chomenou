@@ -1,5 +1,6 @@
 import sqlite3
 
+from domain.aggregates import YearlyStatementSummary, MonthlyStatementSummary
 from domain.entities import AccountType, Account, Statement
 from domain.exceptions import AccountNotFoundException
 from domain.repositories import IStatementRepository, IAccountTypeRepository, IAccountRepository
@@ -114,6 +115,7 @@ class AccountSQLite(SQLiteBase, IAccountRepository):
 
 
 class StatementSQLite(SQLiteBase, IStatementRepository):
+
     def __init__(self):
         super().__init__()
 
@@ -167,42 +169,35 @@ class StatementSQLite(SQLiteBase, IStatementRepository):
             cursor.close()
             return statements
 
-    def insert(self, statement: Statement):
-        sql = f"INSERT INTO `statements` (`year`, `month`, `day`, `account_id`, `amount`) " \
-              f"VALUES ({statement.year}, {statement.month}, {statement.day}, " \
-              f"{statement.account_id}, {statement.amount.value})"
-
+    def upsert(self, statement: Statement):
         cursor = self.conn.cursor()
         try:
+            sql = f"SELECT `amount` " \
+                  f"FROM `statements` " \
+                  f"WHERE (`year`, `month`, `day`, `account_id`) = " \
+                  f"({statement.year}, {statement.month}, {statement.day}, {statement.account_id})"
+
             cursor.execute(sql)
+
+            row = cursor.fetchone()
+            if row is None:
+                current_amount = 0
+            else:
+                current_amount = int(row[0])
+
+            sql = f"REPLACE INTO `statements` (`year`, `month`, `day`, `account_id`, `amount`) " \
+                  f"VALUES ({statement.year}, {statement.month}, {statement.day}, " \
+                  f"{statement.account_id}, {statement.amount.value + current_amount})"
+            cursor.execute(sql)
+
             self.conn.commit()
         except sqlite3.Error:
             self.conn.rollback()
         finally:
             cursor.close()
 
-    def get_daily_account_summary(self, year: int, month: int, day: int) -> list[Statement]:
-        sql = f"SELECT `year`, `month`, `day`, `account_id`, SUM(`amount`) AS `total` " \
-              f"FROM `statements` " \
-              f"WHERE `year` = {year} AND `month` = {month} AND `day` = {day} " \
-              f"GROUP BY `year`, `month`, `day`, `account_id` " \
-              f"ORDER BY `account_id`"
-        cursor = self.conn.cursor()
-        statements = []
-        try:
-            cursor.execute(sql)
-            for row in cursor:
-                year, month, day, account_id, total = row
-                s = Statement(year=year, month=month, day=day,
-                              account_id=account_id,
-                              amount=Amount(total))
-                statements.append(s)
-        finally:
-            cursor.close()
-            return statements
-
-    def get_monthly_account_summary(self, year: int, month: int) -> list[Statement]:
-        sql = f"SELECT `year`, `month`, `account_id`, SUM(`amount`) AS `total`, MAX(`created_at`) AS `updated_at` " \
+    def get_monthly_statement_summary(self, year: int, month: int) -> MonthlyStatementSummary:
+        sql = f"SELECT `year`, `month`, `account_id`, SUM(`amount`) AS `total` " \
               f"FROM `statements` " \
               f"WHERE `year` = {year} AND `month` = {month} " \
               f"GROUP BY `account_id` " \
@@ -212,39 +207,24 @@ class StatementSQLite(SQLiteBase, IStatementRepository):
         try:
             cursor.execute(sql)
             for row in cursor:
-                year, month, account_id, total, updated_at = row
-                s = Statement(year=year, month=month, day=0,
-                              account_id=account_id,
-                              amount=Amount(total))
-
-                statements.append(s)
-        finally:
-            cursor.close()
-            return statements
-
-    def get_yearly_account_summary(self, year: int) -> list[Statement]:
-        sql = f"SELECT `year`, `month`, `account_id`, SUM(`amount`) AS `total` " \
-              f"FROM `statements`" \
-              f"WHERE `year` = {year} " \
-              f"GROUP BY `year`, `month`, `account_id` " \
-              f"ORDER BY `month`, `account_id`"
-
-        cursor = self.conn.cursor()
-        statement = []
-        try:
-            cursor.execute(sql)
-            for row in cursor:
                 year, month, account_id, total = row
-                if year is not None:
-                    statement = Statement(year=year, month=month, day=0,
-                                          account_id=account_id,
-                                          amount=Amount(total))
+                s = Statement(year=year, month=month, day=0, account_id=account_id, amount=Amount(total))
+                statements.append(s)
 
         finally:
             cursor.close()
-            return statement
 
-    def get_daily_total_by_account_and_month_and_year(self, year: int, month: int, account_id: int) -> list[Statement]:
+            return MonthlyStatementSummary(year=year, month=month, statements=statements)
+
+    def get_yearly_statement_summary(self, year: int) -> YearlyStatementSummary:
+        monthly_summaries = []
+        for month in range(1, 13):
+            summary = self.get_monthly_statement_summary(year=year, month=month)
+            monthly_summaries.append(summary)
+
+        return YearlyStatementSummary(year=year, summaries=monthly_summaries)
+
+    def get_monthly_statement_detail(self, year: int, month: int, account_id: int) -> list[Statement]:
         sql = f"SELECT `year`, `month`, `day`, `account_id`, SUM(`amount`) AS `total` " \
               f"FROM `statements` " \
               f"WHERE `year` = {year} AND `month` = {month} AND `account_id` = {account_id} " \

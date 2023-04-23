@@ -13,7 +13,6 @@ class Singleton(type):
         return cls._instances[cls]
 
 
-# TODO: .ini ファイルに変更 configparser を用いる
 class Config(metaclass=Singleton):
     is_fake = None
     sqlite_filepath = None

@@ -44,7 +44,6 @@ class TestMainWindowPresenter(unittest.TestCase):
 
     def test_execute_registration(self):
         with self.subTest("記帳アクションを実行できる"):
-
             shiire = AccountList().get_account_by_name("仕入")
             self.presenter.execute_registration(2000, 9, 3, "3000", shiire)
 

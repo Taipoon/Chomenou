@@ -6,9 +6,9 @@ VALUES ('変動費', 'hendohi'),
 
 INSERT INTO `accounts` (`account_name`, `account_name_hepburn`, `account_type_id`, `default_amount`)
 VALUES ('仕入', 'shiire', 1, 0),
-       ('接待','settai', 1, 0),
+       ('接待', 'settai', 1, 0),
        ('雑費', 'zappi', 1, 0),
-       ('消耗品','shomohin', 1, 0),
+       ('消耗品', 'shomohin', 1, 0),
        ('家賃', 'yachin', 1, 0),
        ('アイス', 'aisu', 1, 0),
        ('大阪ガス', 'osakagas', 1, 0),

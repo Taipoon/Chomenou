@@ -1,5 +1,6 @@
 import abc
 
+from domain.aggregates import MonthlyStatementSummary, YearlyStatementSummary
 from domain.entities import AccountType, Account, Statement
 
 
@@ -75,52 +76,37 @@ class IStatementRepository(abc.ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def insert(self, statement: Statement):
+    def upsert(self, statement: Statement):
         """
-        新たな明細を追加します。
-        :param statement: 追加する明細
+        新たな明細を追加または修正します。
+        :param statement: 追加・修正する明細
         :return: None
         """
         raise NotImplementedError
 
     @abc.abstractmethod
-    def get_daily_account_summary(self, year: int, month: int, day: int) -> list[Statement]:
-        """
-        引数で指定した年・月・日の明細データを勘定科目ごとに集計して取得します。
-        結果の明細は勘定科目IDで昇順ソートされています。
-        0件の場合は空のリストを返します。
-        :param year: 年
-        :param month: 月
-        :param day: 日
-        :return: 明細のリスト
-        """
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    def get_monthly_account_summary(self, year: int, month: int) -> list[Statement]:
+    def get_monthly_statement_summary(self, year: int, month: int) -> MonthlyStatementSummary:
         """
         引数で指定した年・月の明細データを勘定科目ごとに集計して取得します。
         結果の明細は勘定科目IDで昇順ソートされています。
-        0件の場合は空のリストを返します。
         :param year: 年
         :param month: 月
-        :return: 明細のリスト
+        :return: 月間明細サマリ
         """
         raise NotImplementedError
 
     @abc.abstractmethod
-    def get_yearly_account_summary(self, year: int) -> list[Statement]:
+    def get_yearly_statement_summary(self, year: int) -> YearlyStatementSummary:
         """
         引数で指定した年の明細データを月別かつ勘定科目ごとに集計して取得します。
         結果の明細は月、勘定科目IDの順で昇順ソートされています。
-        0件の場合は空のリストを返します。
         :param year: 年
-        :return: 明細のリスト
+        :return: 年間明細サマリ
         """
         raise NotImplementedError
 
     @abc.abstractmethod
-    def get_daily_total_by_account_and_month_and_year(self, year: int, month: int, account_id: int) -> list[Statement]:
+    def get_monthly_statement_detail(self, year: int, month: int, account_id: int) -> list[Statement]:
         """
         引数で指定した年・月・勘定科目の明細データを日毎に集計して取得します。
         結果の明細は日で昇順ソートされています。

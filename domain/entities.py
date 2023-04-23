@@ -98,7 +98,7 @@ class Statement(object):
                 self._month == other.month,
                 self._day == other.day,
                 self._account_id == other.account_id,
-                ])
+            ])
         return False
 
     def __ne__(self, other):

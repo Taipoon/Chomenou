@@ -14,7 +14,7 @@ def main():
     if Config.is_fake:
         print("DEBUG MODE: using fake data")
 
-    print("Database:", Config.sqlite_filepath)
+    print("Connecting Database:", Config.sqlite_filepath)
 
     window = MainWindow()
     window.show()

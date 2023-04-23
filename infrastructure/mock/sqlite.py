@@ -82,7 +82,7 @@ class StatementMock(IStatementRepository, metaclass=make_cls(abc.ABCMeta, Single
                       account_id=account.id, amount=Amount(sum(filtered)))
         return s
 
-    def get_daily_total_by_account_and_month_and_year(self, year: int, month: int, account: Account) -> list[Statement]:
+    def get_monthly_statement_detail(self, year: int, month: int, account: Account) -> list[Statement]:
         s = [s for s in self._statements if s.account_id == account.id and s.year == year and s.month == month]
         return s
 

@@ -2,6 +2,7 @@ from PyQt6.QtCore import QDate
 from PyQt6.QtGui import QIntValidator, QIcon, QAction
 from PyQt6.QtWidgets import QTableWidgetItem, QTreeWidgetItem, QErrorMessage, QPushButton
 
+from domain.aggregates import MonthlyStatementSummary
 from domain.entities import Account, Statement
 from domain.exceptions import InvalidAmountException
 from domain.helpers.metaclass_resolver import make_cls
@@ -211,18 +212,27 @@ class MainWindow(Ui_MainWindow, MainView, metaclass=make_cls()):
             self.tableWidget_dailySummaryViewer.setItem(row, 1,
                                                         QTableWidgetItem(statement.amount.comma_value_with_unit))
 
-    def update_monthly_summary_viewer(self, summary):
+    def update_monthly_summary_viewer(self, summary: MonthlyStatementSummary):
         """毎月の勘定科目ごとの日別合計金額を表示します"""
         self.treeWidget_monthlySummaryViewer.clear()
-        for s in summary:
+        for s in summary.statements:
             top_level_item = QTreeWidgetItem()
-            top_level_item.setText(0, s.account.name)
-            top_level_item.setText(1, s.total_amount.comma_value_with_unit)
 
-            for detail in s.details:
+            account = self._accounts.get_account_by_id(s.account_id)
+            top_level_item.setText(0, account.name)
+
+            total_amount = summary.get_total_amount_by_account_id(s.account_id)
+            top_level_item.setText(1, total_amount.comma_value_with_unit)
+
+            details = self._statement_repository.get_monthly_statement_detail(
+                year=summary.year,
+                month=summary.month,
+                account_id=account.id,
+            )
+            for detail in details:
                 item = QTreeWidgetItem()
                 item.setText(0, detail.display_date)
-                item.setText(1, detail.amount.comma_value_with_unit)
+                item.setText(1, " " * 5 + detail.amount.comma_value_with_unit)
 
                 top_level_item.addChild(item)
 
