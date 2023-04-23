@@ -41,7 +41,7 @@ if __name__ == '__main__':
     # fixed_datetime.fix(2000, 9, 3, 0, 0, 0)
 
     print(fixed_datetime.now())
-    fixed_datetime.fix(2000, 9, 3, 12, 34 ,56)
+    fixed_datetime.fix(2000, 9, 3, 12, 34, 56)
     print(fixed_datetime.now())
     print(fixed_datetime.today())
     print(fixed_datetime.now())

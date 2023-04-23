@@ -1,6 +1,7 @@
 import abc
 
-from domain.entities import Statement, Account, MonthlyAccountSummary
+from domain.aggregates import MonthlyStatementSummary
+from domain.entities import Statement, Account
 from domain.valueobjects import Amount
 
 
@@ -18,6 +19,7 @@ class MainView(AbstractBaseView):
     """
     主に記帳を行う、メインのビュー
     """
+
     @abc.abstractmethod
     def update_selected_account(self, account: Account):
         """
@@ -70,16 +72,16 @@ class MainView(AbstractBaseView):
     def update_daily_summary_viewer(self, statements: list[Statement]):
         """
         日ごとのサマリを表示します
-        :param statements: 明細
+        :param statements: 明細のリスト
         :return:
         """
         raise NotImplementedError
 
     @abc.abstractmethod
-    def update_monthly_summary_viewer(self, summary: list[MonthlyAccountSummary]):
+    def update_monthly_summary_viewer(self, summary: MonthlyStatementSummary):
         """
         月ごとのサマリを表示します
-        :param summary:
+        :param summary: 月間明細サマリ
         :return:
         """
         raise NotImplementedError
@@ -89,6 +91,7 @@ class AccountsEditorView(AbstractBaseView):
     """
     勘定科目の編集を担うビュー
     """
+
     @abc.abstractmethod
     def update_line_edit(self, account: Account, amount: Amount):
         """
@@ -104,6 +107,7 @@ class BulkInsertionView(AbstractBaseView):
     """
     一括記帳機能を担うビュー
     """
+
     @abc.abstractmethod
     def set_day_input_selector_max_range(self, max_day: int):
         """
@@ -145,6 +149,7 @@ class StatisticsView(AbstractBaseView):
     """
     統計情報を表示するビュー
     """
+
     @abc.abstractmethod
     def update_accounts_summary_bar_chart(self, summary: dict[Account: list[Statement]]):
         """

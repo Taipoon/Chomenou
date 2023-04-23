@@ -1,19 +1,22 @@
-import datetime
+from domain.exceptions import InvalidAmountException
 
 
 class Amount(object):
     unit_name = "円"
 
     def __init__(self, amount: int):
+        if amount < 0:
+            raise InvalidAmountException
+
         self._amount = amount
 
     def __str__(self):
         return str(self._amount)
 
     def __eq__(self, other) -> bool:
-        if not isinstance(other, Amount):
-            return False
-        return self.value == other.value
+        if isinstance(other, Amount):
+            return self.value == other.value
+        return False
 
     def __ne__(self, other) -> bool:
         return not self.__eq__(other)
@@ -28,21 +31,4 @@ class Amount(object):
 
     @property
     def comma_value_with_unit(self) -> str:
-        return f"{self.value:,} {self.unit_name}"
-
-
-class StatementCreatedAt(object):
-    def __init__(self, created_at: str):
-        self._created_at = created_at
-
-    @property
-    def datetime(self) -> datetime.datetime:
-        return datetime.datetime.strptime(self._created_at, "%Y-%m-%d %H:%M:%S")
-
-    @property
-    def raw_str(self) -> str:
-        return self._created_at
-
-    @property
-    def standard_format(self) -> str:
-        return self.datetime.strftime("%Y年%m月%d日 %H時%M分%S秒")
+        return f"{self.value:,}{self.unit_name}"

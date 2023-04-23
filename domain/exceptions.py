@@ -7,7 +7,7 @@ class InvalidConfigException(Exception):
 
 class InvalidAmountException(Exception):
     """
-    金額入力欄に不適切な値があった場合に送出されます。
+    金額が不適切な場合に送出されます。
     """
     pass
 
@@ -23,3 +23,4 @@ class AccountNotFoundException(Exception):
     """
     存在しない勘定科目へのアクセスで送出されます。
     """
+    pass

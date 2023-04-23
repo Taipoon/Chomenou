@@ -23,7 +23,8 @@ class Ui_BulkInsertionDialog(QtWidgets.QDialog):
         self.buttonBox.setGeometry(QtCore.QRect(30, 390, 261, 32))
         self.buttonBox.setLayoutDirection(QtCore.Qt.LayoutDirection.LeftToRight)
         self.buttonBox.setOrientation(QtCore.Qt.Orientation.Horizontal)
-        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.StandardButton.Cancel|QtWidgets.QDialogButtonBox.StandardButton.Ok)
+        self.buttonBox.setStandardButtons(
+            QtWidgets.QDialogButtonBox.StandardButton.Cancel | QtWidgets.QDialogButtonBox.StandardButton.Ok)
         self.buttonBox.setObjectName("buttonBox")
         self.grpBx_monthSelector = QtWidgets.QGroupBox(self)
         self.grpBx_monthSelector.setGeometry(QtCore.QRect(20, 190, 271, 141))
@@ -160,8 +161,8 @@ class Ui_BulkInsertionDialog(QtWidgets.QDialog):
         self.cmbBx_yearSelector.setObjectName("cmbBx_yearSelector")
 
         self.retranslateUi()
-        self.buttonBox.accepted.connect(self.accept) # type: ignore
-        self.buttonBox.rejected.connect(self.reject) # type: ignore
+        self.buttonBox.accepted.connect(self.accept)  # type: ignore
+        self.buttonBox.rejected.connect(self.reject)  # type: ignore
         QtCore.QMetaObject.connectSlotsByName(self)
 
     def retranslateUi(self):

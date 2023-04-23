@@ -17,7 +17,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def setupUi(self):
         self.setObjectName("MainWindow")
         self.resize(872, 757)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Preferred, QtWidgets.QSizePolicy.Policy.Preferred)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Preferred,
+                                           QtWidgets.QSizePolicy.Policy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.sizePolicy().hasHeightForWidth())
@@ -42,7 +43,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.calenderWidget_calenderViewer.setGeometry(QtCore.QRect(10, 40, 411, 241))
         self.calenderWidget_calenderViewer.setStyleSheet("")
         self.calenderWidget_calenderViewer.setGridVisible(True)
-        self.calenderWidget_calenderViewer.setVerticalHeaderFormat(QtWidgets.QCalendarWidget.VerticalHeaderFormat.NoVerticalHeader)
+        self.calenderWidget_calenderViewer.setVerticalHeaderFormat(
+            QtWidgets.QCalendarWidget.VerticalHeaderFormat.NoVerticalHeader)
         self.calenderWidget_calenderViewer.setNavigationBarVisible(True)
         self.calenderWidget_calenderViewer.setObjectName("calenderWidget_calenderViewer")
         self._grpBx_accountButtonSelector = QtWidgets.QGroupBox(self._widget_centralWidget)
@@ -256,7 +258,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.cmbBx_fixedCostSelector.setObjectName("cmbBx_fixedCostSelector")
         self.tableWidget_dailySummaryViewer = QtWidgets.QTableWidget(self._widget_centralWidget)
         self.tableWidget_dailySummaryViewer.setGeometry(QtCore.QRect(440, 10, 420, 310))
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding,
+                                           QtWidgets.QSizePolicy.Policy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.tableWidget_dailySummaryViewer.sizePolicy().hasHeightForWidth())
@@ -264,9 +267,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.tableWidget_dailySummaryViewer.setMaximumSize(QtCore.QSize(16777215, 500))
         self.tableWidget_dailySummaryViewer.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.tableWidget_dailySummaryViewer.setAlternatingRowColors(False)
-        self.tableWidget_dailySummaryViewer.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.tableWidget_dailySummaryViewer.setSelectionBehavior(
+            QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
         self.tableWidget_dailySummaryViewer.setTextElideMode(QtCore.Qt.TextElideMode.ElideLeft)
-        self.tableWidget_dailySummaryViewer.setHorizontalScrollMode(QtWidgets.QAbstractItemView.ScrollMode.ScrollPerItem)
+        self.tableWidget_dailySummaryViewer.setHorizontalScrollMode(
+            QtWidgets.QAbstractItemView.ScrollMode.ScrollPerItem)
         self.tableWidget_dailySummaryViewer.setObjectName("tableWidget_dailySummaryViewer")
         self.tableWidget_dailySummaryViewer.setColumnCount(2)
         self.tableWidget_dailySummaryViewer.setRowCount(1)
@@ -311,7 +316,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.tableWidget_dailySummaryViewer.verticalHeader().setHighlightSections(True)
         self.treeWidget_monthlySummaryViewer = QtWidgets.QTreeWidget(self._widget_centralWidget)
         self.treeWidget_monthlySummaryViewer.setGeometry(QtCore.QRect(440, 370, 420, 350))
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding,
+                                           QtWidgets.QSizePolicy.Policy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.treeWidget_monthlySummaryViewer.sizePolicy().hasHeightForWidth())
@@ -326,7 +332,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         font.setBold(True)
         font.setWeight(75)
         self.treeWidget_monthlySummaryViewer.headerItem().setFont(0, font)
-        self.treeWidget_monthlySummaryViewer.headerItem().setTextAlignment(1, QtCore.Qt.AlignmentFlag.AlignLeading|QtCore.Qt.AlignmentFlag.AlignVCenter)
+        self.treeWidget_monthlySummaryViewer.headerItem().setTextAlignment(1,
+                                                                           QtCore.Qt.AlignmentFlag.AlignLeading | QtCore.Qt.AlignmentFlag.AlignVCenter)
         font = QtGui.QFont()
         font.setPointSize(11)
         font.setBold(True)

@@ -30,7 +30,8 @@ class Ui_AccountsEditorDialog(QtWidgets.QDialog):
         self.buttonBox = QtWidgets.QDialogButtonBox(self)
         self.buttonBox.setGeometry(QtCore.QRect(6, 227, 155, 32))
         self.buttonBox.setOrientation(QtCore.Qt.Orientation.Horizontal)
-        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.StandardButton.Cancel|QtWidgets.QDialogButtonBox.StandardButton.Save)
+        self.buttonBox.setStandardButtons(
+            QtWidgets.QDialogButtonBox.StandardButton.Cancel | QtWidgets.QDialogButtonBox.StandardButton.Save)
         self.buttonBox.setObjectName("buttonBox")
         self.label_oshibori_yen = QtWidgets.QLabel(self)
         self.label_oshibori_yen.setGeometry(QtCore.QRect(220, 70, 52, 18))
@@ -79,8 +80,8 @@ class Ui_AccountsEditorDialog(QtWidgets.QDialog):
         self.lineEdit_oshibori.setObjectName("lineEdit_oshibori")
 
         self.retranslateUi()
-        self.buttonBox.accepted.connect(self.accept) # type: ignore
-        self.buttonBox.rejected.connect(self.reject) # type: ignore
+        self.buttonBox.accepted.connect(self.accept)  # type: ignore
+        self.buttonBox.rejected.connect(self.reject)  # type: ignore
         QtCore.QMetaObject.connectSlotsByName(self)
 
     def retranslateUi(self):

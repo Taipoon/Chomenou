@@ -10,7 +10,6 @@ from domain.shared import Config
 from domain.views import StatisticsView
 from presenters.statistics_presenter import StatisticsPresenter
 
-
 BAR_CHART_TICK_INTERVAL = 5000
 BAR_CHART_MINOR_TICK_COUNT = 3
 
@@ -114,7 +113,7 @@ def calculate_max_range_value(max_value: int):
 
 
 if __name__ == '__main__':
-    Config.parse()
+    Config.parse("../config.ini")
     app = QApplication(sys.argv)
     dialog = StatisticsWindow(2025)
     dialog.show()
