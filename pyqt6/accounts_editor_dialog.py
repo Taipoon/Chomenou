@@ -1,10 +1,10 @@
 from PyQt6.QtGui import QIntValidator
-from PyQt6.QtWidgets import QLineEdit, QMessageBox, QWidget
+from PyQt6.QtWidgets import QLineEdit
 
 from domain.entities import Account
 from domain.exceptions import AccountNotFoundException
 from domain.helpers.metaclass_resolver import make_cls
-from domain.shared import Signal
+from domain.staticvalues import AccountList, AccountTypeList
 from domain.valueobjects import Amount
 from domain.views import AccountsEditorView
 from presenters.accounts_editor_presenter import AccountsEditorPresenter
@@ -14,8 +14,8 @@ from pyqt6.ui_files.ui_accounts_editor_dialog import Ui_AccountsEditorDialog
 class AccountsEditorDialog(Ui_AccountsEditorDialog, AccountsEditorView, metaclass=make_cls()):
     def __init__(self):
         super().__init__()
-        self._accounts = Accounts()
-        self._account_types = AccountTypes()
+        self._accounts = AccountList()
+        self._account_types = AccountTypeList()
         self._presenter = AccountsEditorPresenter(view=self)
 
     def initialize_ui(self):
@@ -47,7 +47,7 @@ class AccountsEditorDialog(Ui_AccountsEditorDialog, AccountsEditorView, metaclas
                 if name.startswith("lineEdit_"):
                     # UI 部品名から、該当する勘定科目オブジェクトを取得
                     hepburn_name = name.split("_")[1]
-                    account = Accounts().get_account_by_hepburn(hepburn=hepburn_name)
+                    account = self._accounts.get_account_by_hepburn(hepburn=hepburn_name)
 
                     # 入力された金額を整数に変換する
                     input_value = obj.text()
@@ -72,7 +72,7 @@ class AccountsEditorDialog(Ui_AccountsEditorDialog, AccountsEditorView, metaclas
 
         except ValueError as e:
             # raise InvalidAmountException
-            self.show_popup(parent=self, level=Signal.WARNING, title="値エラー", e=e)
+            print(e)
 
     def update_line_edit(self, account: Account, amount: Amount):
         """引数で指定した account の 初期金額入力欄を amount で更新します"""
@@ -83,16 +83,3 @@ class AccountsEditorDialog(Ui_AccountsEditorDialog, AccountsEditorView, metaclas
 
         edit: QLineEdit = getattr(self, "lineEdit_" + h_name)
         edit.setText(str(amount.value))
-
-    @staticmethod
-    def show_popup(parent: QWidget, level: Signal, title: str, e: Exception):
-        text = " | ".join(e.args)
-
-        if level == Signal.INFO:
-            QMessageBox.information(parent, title, text)
-        elif level == Signal.ABOUT:
-            QMessageBox.about(parent, title, text)
-        elif level == Signal.WARNING:
-            QMessageBox.warning(parent, title, text)
-        elif level == Signal.CRITICAL:
-            QMessageBox.critical(parent, title, text)
