@@ -1,4 +1,3 @@
-from domain.staticvalues import Accounts
 from domain.valueobjects import Amount
 
 
@@ -90,8 +89,8 @@ class Statement(object):
         self._month = month
         self._day = day
 
-        account = Accounts().get_account_by_id(account_id)
-        self._account_id = account.id
+        # account = Accounts().get_account_by_id(account_id)
+        self._account_id = account_id
 
         self._amount = amount
 

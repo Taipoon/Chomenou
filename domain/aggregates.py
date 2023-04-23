@@ -1,4 +1,4 @@
-from domain.entities import Account, Statement
+from domain.entities import Statement
 from domain.valueobjects import Amount
 
 

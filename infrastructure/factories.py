@@ -7,7 +7,7 @@ from infrastructure.mock.sqlite import AccountTypeMock, AccountMock, StatementMo
 class AccountTypeFactory(metaclass=Singleton):
     @classmethod
     def create(cls) -> IAccountTypeRepository:
-        if Config.debug:
+        if Config.is_fake:
             return AccountTypeMock()
         return AccountTypeSQLite()
 
@@ -15,7 +15,7 @@ class AccountTypeFactory(metaclass=Singleton):
 class AccountFactory(metaclass=Singleton):
     @classmethod
     def create(cls) -> IAccountRepository:
-        if Config.debug:
+        if Config.is_fake:
             return AccountMock()
         return AccountSQLite()
 
@@ -23,6 +23,6 @@ class AccountFactory(metaclass=Singleton):
 class StatementFactory(metaclass=Singleton):
     @classmethod
     def create(cls) -> IStatementRepository:
-        if Config.debug:
+        if Config.is_fake:
             return StatementMock()
         return StatementSQLite()

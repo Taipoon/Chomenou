@@ -15,7 +15,7 @@ class Singleton(type):
 
 # TODO: .ini ファイルに変更 configparser を用いる
 class Config(metaclass=Singleton):
-    debug = None
+    is_fake = None
     sqlite_filepath = None
     output_excel_filepath = None
     output_csv_filepath = None
@@ -28,7 +28,7 @@ class Config(metaclass=Singleton):
 
             envs = parser[section]
             # fake data
-            cls.debug = envs.get("DEBUG").lower() == "true" or force_debug
+            cls.is_fake = envs.get("IS_FAKE").lower() == "true" or force_debug
             # path to sqlite database for production
             cls.sqlite_filepath = os.path.abspath(envs.get("SQLITE_FILEPATH"))
             # path to output files

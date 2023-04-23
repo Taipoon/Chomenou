@@ -1,6 +1,6 @@
 import abc
 
-from domain.entities import Statement, Account, MonthlyAccountSummary
+from domain.entities import Statement, Account
 from domain.valueobjects import Amount
 
 
@@ -76,7 +76,7 @@ class MainView(AbstractBaseView):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def update_monthly_summary_viewer(self, summary: list[MonthlyAccountSummary]):
+    def update_monthly_summary_viewer(self, summary):
         """
         月ごとのサマリを表示します
         :param summary:

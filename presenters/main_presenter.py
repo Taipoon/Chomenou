@@ -1,6 +1,6 @@
 import datetime
 
-from domain.entities import Statement, Account, MonthlyAccountSummary
+from domain.entities import Statement, Account
 from domain.exceptions import InvalidAmountException
 from domain.staticvalues import Accounts, AccountTypes
 from domain.valueobjects import Amount
@@ -80,13 +80,14 @@ class MainPresenter(object):
             if account is None:
                 continue
             details = self._statement_repository.get_daily_total_by_account_and_month_and_year(year, month, account)
-
+        """
             summary = MonthlyAccountSummary(account=account,
                                             total_amount=statement.amount,
                                             details=details)
             summary_results.append(summary)
 
         self._view.update_monthly_summary_viewer(summary_results)
+        """
 
     def _is_date_changed(self, year: int, month: int, day: int) -> bool:
         return self._selected_year == year and self._selected_month == month and self._selected_day == day

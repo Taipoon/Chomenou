@@ -7,7 +7,7 @@ from PyQt6.QtGui import QIntValidator, QIcon, QAction
 from PyQt6.QtWidgets import QTableWidgetItem, QTreeWidgetItem, QErrorMessage, QPushButton
 
 if TYPE_CHECKING:
-    from domain.entities import Account, Statement, MonthlyAccountSummary
+    from domain.entities import Account, Statement
 
 from domain.exceptions import InvalidAmountException
 from domain.helpers.metaclass_resolver import make_cls
@@ -23,7 +23,7 @@ from pyqt6.ui_files.ui_main_window import Ui_MainWindow
 class MainWindow(Ui_MainWindow, MainView, metaclass=make_cls()):
     def __init__(self):
         super().__init__()
-        self._accounts = Accounts().all()
+        self._accounts = Accounts()
         self._statement_repository = StatementFactory.create()
         self._account_repository = AccountFactory.create()
 
@@ -209,6 +209,7 @@ class MainWindow(Ui_MainWindow, MainView, metaclass=make_cls()):
         self.tableWidget_dailySummaryViewer.setRowCount(len(statements))
         for row, statement in enumerate(statements):
             account = self._accounts.get_account_by_id(statement.account_id)
+
             if account is None:
                 continue
             self.tableWidget_dailySummaryViewer.setItem(row, 0,
@@ -216,7 +217,7 @@ class MainWindow(Ui_MainWindow, MainView, metaclass=make_cls()):
             self.tableWidget_dailySummaryViewer.setItem(row, 1,
                                                         QTableWidgetItem(statement.amount.comma_value_with_unit))
 
-    def update_monthly_summary_viewer(self, summary: list[MonthlyAccountSummary]):
+    def update_monthly_summary_viewer(self, summary):
         """毎月の勘定科目ごとの日別合計金額を表示します"""
         self.treeWidget_monthlySummaryViewer.clear()
         for s in summary:
