@@ -60,7 +60,7 @@ class AccountsEditorDialog(Ui_AccountsEditorDialog, AccountsEditorView, metaclas
                         account_id=account.id,
                         account_name=account.name,
                         account_name_hepburn=account.name_hepburn,
-                        account_type=account.type,
+                        account_type_id=account.type_id,
                         default_amount=Amount(updated_value),
                     )
                     update_accounts.append(updated_account)

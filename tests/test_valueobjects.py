@@ -4,6 +4,7 @@ from domain.exceptions import InvalidAmountException
 from domain.valueobjects import Amount
 
 
+# noinspection NonAsciiCharacters
 class TestAmount(unittest.TestCase):
     def test_イコールで正しく評価できる(self):
         with self.subTest("等しい場合に等価演算子でTrueを返せる"):

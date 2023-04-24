@@ -6,13 +6,13 @@ from domain.staticvalues import AccountList
 from domain.valueobjects import Amount
 from infrastructure.mock.sqlite import StatementMock
 from presenters.main_presenter import MainPresenter
-from pyqt6.mock import MainViewMock
+from pyqt6.mock.main_view import MainViewMock
 
 
 class TestMainWindowPresenter(unittest.TestCase):
     # TODO: テストメソッドを日本語にする
     def setUp(self) -> None:
-        Config.parse(force_debug=True, dotenv_path=".env.test")
+        Config.parse(force_debug=True, ini_filepath="../config.ini", section="DEV.FAKE")
         self.view = MainViewMock()
         self.presenter = MainPresenter(self.view)
         self.repository = StatementMock()

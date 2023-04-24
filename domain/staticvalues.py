@@ -35,7 +35,7 @@ class AccountList(metaclass=Singleton):
         return self._accounts
 
     def filter(self, account_type_id: int):
-        return [a for a in self._accounts if a.type.id == account_type_id]
+        return [a for a in self._accounts if a.type_id == account_type_id]
 
     def get_account_by_id(self, account_id: int):
         for account in self._accounts:

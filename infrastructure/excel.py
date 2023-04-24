@@ -46,7 +46,7 @@ class AccountBookExcelExporter(IAccountBookExporter):
 
         # 1列目に列ヘッダを書き込む
         for month_num in range(1, 13):
-            data = self._statement_repository.get_monthly_account_summary(year=self.year, month=month_num)
+            data = self._statement_repository.get_monthly_statement_summary(year=self.year, month=month_num)
             print(data)
 
             self._worksheet.cell(row=base_pos["row"] + month_num,

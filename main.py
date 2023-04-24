@@ -10,11 +10,11 @@ def main():
     # Create application instance
     app = QApplication(sys.argv)
 
-    Config.parse(ini_filepath="config.ini", section="DEV")
+    Config.parse(ini_filepath="config.ini", section="DEV.TESTDB")
     if Config.is_fake:
         print("DEBUG MODE: using fake data")
-
-    print("Connecting Database:", Config.sqlite_filepath)
+    else:
+        print("Connecting Database:", Config.sqlite_filepath)
 
     window = MainWindow()
     window.show()

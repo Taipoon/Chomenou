@@ -1,6 +1,7 @@
 import sqlite3
 import unittest
 
+from domain.criterias import UpsertAccountCriteria
 from domain.entities import Account, AccountType, Statement
 from domain.shared import Config
 from domain.valueobjects import Amount
@@ -13,11 +14,12 @@ DUMMY_CSV_FILES = [
     "statements.csv",
 ]
 
-Config.parse("../config.ini")
+Config.parse("../config.ini", section="DEV.FAKE")
 db_path = Config.sqlite_filepath
 testdb = TestDB(db_path=db_path, dummy_csv_files=DUMMY_CSV_FILES)
 
 
+# noinspection NonAsciiCharacters
 class TestAccountSQLite(unittest.TestCase):
     def setUp(self) -> None:
         testdb.reset()
@@ -67,30 +69,26 @@ class TestAccountSQLite(unittest.TestCase):
             self.expected_all_accounts.append(Account(account_id=account_id,
                                                       account_name=account_name,
                                                       account_name_hepburn=account_name_hepburn,
-                                                      account_type=account_types.get(type_id),
+                                                      account_type_id=type_id,
                                                       default_amount=amount))
 
     def test_すべての勘定科目を正しい順序で取得できる(self):
         got_accounts = self.account_sqlite.all()
         for e, g in zip(self.expected_all_accounts, got_accounts):
             with self.subTest(f"勘定科目ID: {g.id}, 勘定科目名: {g.name}"):
-                want = [e.id, e.name, e.name_hepburn, e.type.id,
-                        e.type.name, e.type.name_hepburn, e.default_amount.value]
-                got = [g.id, g.name, g.name_hepburn, g.type.id,
-                       g.type.name, g.type.name_hepburn, g.default_amount.value]
+                want = [e.id, e.name, e.name_hepburn, e.type_id.id,
+                        e.type_id.name, e.type_id.name_hepburn, e.default_amount.value]
+                got = [g.id, g.name, g.name_hepburn, g.type_id.id,
+                       g.type_id.name, g.type_id.name_hepburn, g.default_amount.value]
                 self.assertSequenceEqual(want, got)
 
     def test_勘定科目をアップデートできる(self):
-        n = Account(account_id=1, account_name="仕入れ",
-                    account_name_hepburn="shiire",
-                    account_type=AccountType(type_id=2,
-                                             type_name="固定費",
-                                             type_name_hepburn="koteihi"),
-                    default_amount=Amount(800))
+        self.account_sqlite.update(1, UpsertAccountCriteria(account_name="仕入れ",
+                                                            account_name_hepburn="shiire",
+                                                            account_type_id=2,
+                                                            default_amount=Amount(800)))
 
-        self.account_sqlite.update_account(1, n)
-
-        # 更新されたかをチェックする
+        # 更新されたかチェックする
         conn = sqlite3.connect(db_path)
         sql = """
         SELECT `id`, `account_name`, `account_name_hepburn`, `account_type_id`, `default_amount` 
@@ -101,10 +99,10 @@ class TestAccountSQLite(unittest.TestCase):
         cursor = conn.execute(sql)
         for row in cursor:
             i, an, anh, ati, da = row
-            self.assertSequenceEqual([i, an, anh, ati, da],
-                                     [n.id, n.name, n.name_hepburn, n.type.id, n.default_amount.value])
+            self.assertSequenceEqual([i, an, anh, ati, da], [1, "仕入れ", "shiire", 2, Amount(800)])
 
 
+# noinspection NonAsciiCharacters
 class TestAccountTypeSQLite(unittest.TestCase):
     def setUp(self) -> None:
         self.account_type_sqlite = AccountTypeSQLite()
@@ -128,6 +126,7 @@ class TestAccountTypeSQLite(unittest.TestCase):
             )
 
 
+# noinspection NonAsciiCharacters
 class TestStatementSQLite(unittest.TestCase):
     def setUp(self) -> None:
         testdb.reset()
@@ -140,8 +139,8 @@ class TestStatementSQLite(unittest.TestCase):
         self.assertSequenceEqual(wants, got)
 
     def test_明細を追加できる(self):
-        new_statement = Statement(year=2010, month=9, day=3, account_id=30, )
-        self.statement_sqlite.insert()
+        new_statement = Statement(year=2010, month=9, day=3, account_id=30, amount=Amount(3399))
+        self.statement_sqlite.upsert(new_statement)
 
 
 if __name__ == '__main__':

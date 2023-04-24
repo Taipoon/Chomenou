@@ -42,4 +42,4 @@ class BulkInsertionPresenter(object):
         for month in self._months:
             s = Statement(year=year, month=month, day=self._day,
                           account_id=account.id, amount=Amount(value))
-            self._statement_repository.insert(s)
+            self._statement_repository.upsert(s)
