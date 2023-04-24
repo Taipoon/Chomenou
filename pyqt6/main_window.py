@@ -26,7 +26,7 @@ class MainWindow(Ui_MainWindow, MainView, metaclass=make_cls()):
 
     def initialize_ui(self):
         # ウィンドウアイコンを設定
-        self.setWindowIcon(QIcon(QPixmap("icon.png")))
+        self.setWindowIcon(QIcon(QPixmap("images/icon.png")))
 
         # 現在日時に設定
         self.dateEdit_dateInputViewer.setDate(QDate.currentDate())
