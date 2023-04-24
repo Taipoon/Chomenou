@@ -1,5 +1,5 @@
 from PyQt6.QtCore import QDate
-from PyQt6.QtGui import QIntValidator, QIcon, QAction
+from PyQt6.QtGui import QIntValidator, QPixmap, QAction, QIcon
 from PyQt6.QtWidgets import QTableWidgetItem, QTreeWidgetItem, QErrorMessage, QPushButton
 
 from domain.aggregates import MonthlyStatementSummary
@@ -26,7 +26,7 @@ class MainWindow(Ui_MainWindow, MainView, metaclass=make_cls()):
 
     def initialize_ui(self):
         # ウィンドウアイコンを設定
-        self.setWindowIcon(QIcon("icon.png"))
+        self.setWindowIcon(QIcon(QPixmap("images/icon.png")))
 
         # 現在日時に設定
         self.dateEdit_dateInputViewer.setDate(QDate.currentDate())

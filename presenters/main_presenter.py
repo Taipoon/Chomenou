@@ -47,7 +47,6 @@ class MainPresenter(object):
         """記帳を行います"""
         try:
             amount = Amount(int(input_text.replace(",", "")))
-            now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
             statement = Statement(year=year, month=month, day=day,
                                   account_id=account.id, amount=amount)
@@ -68,6 +67,7 @@ class MainPresenter(object):
     def _update_daily_summary_viewer(self, year: int, month: int, day: int):
         """日別サマリの更新"""
         statements = self._statement_repository.get(year=year, month=month, day=day)
+        print(statements)
         self._view.update_daily_summary_viewer(statements)
 
     def _update_monthly_summary_viewer(self, year: int, month: int):

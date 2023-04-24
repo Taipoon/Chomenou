@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS `statements`
     `day`        INTEGER NOT NULL,
     `account_id` INTEGER NOT NULL,
     `amount`     INTEGER NOT NULL,
-    `created_at` TEXT    NOT NULL DEFAULT (DATETIME('now', 'localtime')),
+    `updated_at` TEXT    NOT NULL DEFAULT (DATETIME('now', 'localtime')),
     PRIMARY KEY ('year', 'month', 'day', 'account_id'),
     FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`)
 );

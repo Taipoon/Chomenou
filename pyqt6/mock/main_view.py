@@ -1,6 +1,7 @@
 import datetime
 
-from domain.entities import MonthlyAccountSummary, Statement, Account
+from domain.aggregates import MonthlyStatementSummary
+from domain.entities import Statement, Account
 from domain.valueobjects import Amount
 from domain.views import MainView, AccountsEditorView
 
@@ -42,7 +43,7 @@ class MainViewMock(MainView):
     def update_daily_summary_viewer(self, statements: list[Statement]):
         pass
 
-    def update_monthly_summary_viewer(self, summary: list[MonthlyAccountSummary]):
+    def update_monthly_summary_viewer(self, summary: MonthlyStatementSummary):
         pass
 
 

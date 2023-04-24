@@ -36,11 +36,11 @@ class AccountType(object):
 
 class Account(object):
     def __init__(self, account_id: int, account_name: str, account_name_hepburn: str,
-                 account_type: AccountType, default_amount: Amount = Amount(0)):
+                 account_type_id: int, default_amount: Amount = Amount(0)):
         self._account_id = account_id
         self._account_name = account_name
         self._account_name_hepburn = account_name_hepburn
-        self._account_type = account_type
+        self._account_type_id = account_type_id
         self._default_amount = default_amount
 
     def __eq__(self, other):
@@ -52,10 +52,10 @@ class Account(object):
         return not self.__eq__(other)
 
     def __str__(self):
-        return self._account_name
+        return f"{self._account_name} ({self._default_amount.comma_value_with_unit})"
 
     def __hash__(self):
-        return hash(f"{self._account_id}:{self._account_name}:{self._account_type}")
+        return hash(f"{self._account_id}:{self._account_name}:{self._account_type_id}")
 
     @property
     def id(self) -> int:
@@ -73,9 +73,9 @@ class Account(object):
         return self._account_name_hepburn
 
     @property
-    def type(self) -> AccountType:
+    def type_id(self) -> int:
         """勘定科目種別"""
-        return self._account_type
+        return self._account_type_id
 
     @property
     def default_amount(self) -> Amount:
@@ -103,6 +103,9 @@ class Statement(object):
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
+    def __str__(self):
+        return f"({self._year}/{self._month}/{self._day})[{self._account_id}]: {self._amount.comma_value_with_unit}"
 
     @property
     def year(self) -> int:

@@ -2,6 +2,8 @@ import abc
 import csv
 import os.path
 
+from domain.aggregates import YearlyStatementSummary, MonthlyStatementSummary
+from domain.criterias import UpsertAccountCriteria
 from domain.entities import Account, Statement, AccountType
 from domain.exceptions import AccountNotFoundException
 from domain.helpers.metaclass_resolver import make_cls
@@ -10,94 +12,28 @@ from domain.shared import Singleton
 from domain.valueobjects import Amount
 
 
-class StatementMock(IStatementRepository, metaclass=make_cls(abc.ABCMeta, Singleton)):
+class AccountTypeMock(IAccountTypeRepository, metaclass=make_cls(abc.ABCMeta, Singleton)):
     def __init__(self):
-        self._statements = []
-        self.generate_fake()
+        self._account_type: list[AccountType] = []
+        self._load_dummy_data()
 
-    def get_all_years(self) -> list[int]:
-        return [2018, 2019, 2020, 2021, 2022, 2023]
-
-    def generate_fake(self):
-        """
-        予めいくつかのダミーデータを登録しておきたい場合に呼び出します。
-
-        """
-        fake_path = os.path.join(os.path.dirname(__file__), "statements_fake.csv")
+    def _load_dummy_data(self):
+        fake_path = os.path.join(os.path.dirname(__file__), "dummy_data/account_types.csv")
         with open(fake_path, "r", encoding="utf-8") as f:
             csv_reader = csv.DictReader(f)
 
             for row in csv_reader:
-                at = row.get("created_at")
+                i = int(row.get("id"))
+                tn = row.get("type_name")
+                tnh = row.get("type_name_hepburn")
 
-                s = Statement(
-                    year=int(row.get("year")),
-                    month=int(row.get("month")),
-                    day=int(row.get("day")),
-                    account_id=int(row.get("account_id")),
-                    amount=Amount(int(row.get("amount")))
+                self._account_type.append(
+                    AccountType(
+                        type_id=i,
+                        type_name=tn,
+                        type_name_hepburn=tnh,
+                    )
                 )
-                self._statements.append(s)
-
-    def get(self, year: int or None = None, month: int or None = None,
-            day: int or None = None, account: Account or None = None) -> list[Statement]:
-        statement = [s for s in self._statements if s.year == year]
-        if month is not None:
-            statement = [s for s in statement if s.month == month]
-
-        if day is not None:
-            statement = [s for s in statement if s.day == day]
-
-        if account is not None:
-            statement = [s for s in statement if s.account_id == account.id]
-
-        return statement
-
-    def insert(self, statement: Statement):
-        self._statements.append(statement)
-
-    def get_daily_account_summary(self, year: int, month: int, day: int) -> list[Statement]:
-        account_ids = set([s.account_id for s in self._statements])
-        daily_summary = []
-
-        statements = [s for s in self._statements if s.year == year and s.month == month and s.day == day]
-        for account_id in account_ids:
-            total = sum([s.amount.value for s in statements if s.account_id == account_id])
-            daily_summary.append(Statement(year=year, month=month, day=day,
-                                           account_id=account_id, amount=Amount(total)))
-        return daily_summary
-
-    def get_monthly_account_summary(self, year: int, month: int) -> list[Statement]:
-        account_ids = set([s.account_id for s in self._statements])
-        monthly_summary = []
-        for account_id in account_ids:
-            total = sum([s.amount.value for s in self._statements if s.account_id == account_id])
-            monthly_summary.append(Statement(year=year, month=month, day=0,
-                                             account_id=account_id, amount=Amount(total)))
-        return sorted(monthly_summary, key=lambda s: s.account_id)
-
-    def get_yearly_account_summary(self, year: int) -> Statement or None:
-        filtered = [s.amount.value for s in self._statements if s.year == year]
-        s = Statement(year=year, month=0, day=0,
-                      account_id=account.id, amount=Amount(sum(filtered)))
-        return s
-
-    def get_monthly_statement_detail(self, year: int, month: int, account: Account) -> list[Statement]:
-        s = [s for s in self._statements if s.account_id == account.id and s.year == year and s.month == month]
-        return s
-
-
-class AccountTypeMock(IAccountTypeRepository, metaclass=make_cls(abc.ABCMeta, Singleton)):
-    def __init__(self):
-        self._account_type: list[AccountType] = []
-        self._setup()
-
-    def _setup(self):
-        self._account_type = [
-            AccountType(type_id=1, type_name="変動費", type_name_hepburn="hendohi"),
-            AccountType(type_id=2, type_name="固定費", type_name_hepburn="koteihi"),
-            AccountType(type_id=3, type_name="売上", type_name_hepburn="uriage"),
-        ]
 
     def all(self) -> list[AccountType]:
         return self._account_type
@@ -107,40 +43,29 @@ class AccountMock(IAccountRepository, metaclass=make_cls(abc.ABCMeta, Singleton)
     def __init__(self):
         super().__init__()
         self._accounts: list[Account] = []
-        self._setup()
+        self._load_dummy_data()
 
-    def _setup(self):
-        hendohi = AccountType(1, "変動費", "hendohi")
-        koteihi = AccountType(2, "固定費", "koteihi")
-        uriage = AccountType(3, "売上", "uriage")
-        self._accounts = [
-            # 変動費
-            Account(1, "仕入", "shiire", hendohi),
-            Account(2, "接待", "settai", hendohi),
-            Account(3, "雑費", "zappi", hendohi),
-            Account(4, "消耗品", "shomohin", hendohi),
-            Account(5, "家賃", "yachin", hendohi),
+    def _load_dummy_data(self):
+        fake_path = os.path.join(os.path.dirname(__file__), "dummy_data/accounts.csv")
+        with open(fake_path, "r", encoding="utf-8") as f:
+            csv_reader = csv.DictReader(f)
 
-            Account(6, "アイス", "aisu", hendohi),
-            Account(7, "大阪ガス", "osakagas", hendohi),
-            Account(8, "保険", "hoken", hendohi),
-            Account(9, "通信費", "tsushinhi", hendohi),
-            Account(10, "修繕費", "shuzenhi", hendohi),
+            for row in csv_reader:
+                i = int(row.get("id"))
+                an = row.get("account_name")
+                anh = row.get("account_name_hepburn")
+                ati = int(row.get("account_type_id"))
+                da = Amount(int(row.get("default_amount")))
 
-            Account(11, "広告費", "kokokuhi", hendohi, Amount(8800)),
-            Account(12, "自動車税", "jidoshazei", hendohi, Amount(2000)),
-            Account(13, "酒代", "sakadai", hendohi, Amount(14000)),
-            Account(14, "備品", "bihin", hendohi, Amount(14000)),
-            # 固定費
-            Account(15, "おしぼり", "oshibori", koteihi, Amount(2500)),
-            Account(16, "駆除機", "kujoki", koteihi, Amount(7000)),
-            Account(17, "リース植木", "risueki", koteihi, Amount(6000)),
-            Account(18, "著作権", "chosakuken", koteihi, Amount(5000)),
-            Account(19, "カラオケ", "karaoke", koteihi, Amount(5000)),
-            # 売上
-            Account(20, "売上", "uriage", uriage),
-        ]
-        return self._accounts
+                self._accounts.append(
+                    Account(
+                        account_id=i,
+                        account_name=an,
+                        account_name_hepburn=anh,
+                        account_type_id=ati,
+                        default_amount=da,
+                    )
+                )
 
     def all(self) -> list[Account]:
         return self._accounts
@@ -151,8 +76,106 @@ class AccountMock(IAccountRepository, metaclass=make_cls(abc.ABCMeta, Singleton)
                 return a
         raise AccountNotFoundException
 
-    def update_account(self, account_id: int, new_account: Account):
+    def find_by_account_type_id(self, account_type_id: int) -> list[Account]:
+        targets = []
+        for a in self._accounts:
+            if a.type_id == account_type_id:
+                targets.append(a)
+
+        if len(targets) == 0:
+            raise AccountNotFoundException
+
+        return targets
+
+    def update(self, account_id: int, update_account_criteria: UpsertAccountCriteria):
         for i, a in enumerate(self._accounts):
             if a.id == account_id:
-                self._accounts[i] = new_account
-                return
+                new_id = len(self._accounts) + 1
+                n = a.name if update_account_criteria.name is None else update_account_criteria.name
+                nh = a.name_hepburn if update_account_criteria.name_hepburn is None else update_account_criteria.name_hepburn
+                t = a.type_id if update_account_criteria.type_id is None else update_account_criteria.type_id
+                dm = a.default_amount if update_account_criteria.default_amount is None else update_account_criteria.default_amount
+
+                self._accounts[i] = Account(account_id=new_id, account_name=n, account_name_hepburn=nh,
+                                            account_type_id=t, default_amount=dm)
+                break
+        else:
+            raise AccountNotFoundException
+
+    def create(self, new_account_criteria: UpsertAccountCriteria):
+        self._accounts.append(
+            Account(
+                account_id=len(self._accounts) + 1,
+                account_name=new_account_criteria.name,
+                account_name_hepburn=new_account_criteria.name_hepburn,
+                account_type_id=new_account_criteria.type_id,
+                default_amount=new_account_criteria.default_amount,
+            )
+        )
+
+
+class StatementMock(IStatementRepository, metaclass=make_cls(abc.ABCMeta, Singleton)):
+    def __init__(self):
+        self._statements: list[Statement] = []
+        self._load_dummy_data()
+
+    def _load_dummy_data(self):
+        fake_path = os.path.join(os.path.dirname(__file__), "dummy_data/statements.csv")
+        with open(fake_path, "r", encoding="utf-8") as f:
+            csv_reader = csv.DictReader(f)
+
+            for row in csv_reader:
+                y = int(row.get("year"))
+                m = int(row.get("month"))
+                d = int(row.get("day"))
+                ai = int(row.get("account_id"))
+                am = int(row.get("amount"))
+
+                self.upsert(Statement(year=y, month=m, day=d, account_id=ai, amount=Amount(am)))
+
+    def get_all_years(self) -> list[int]:
+        return list(set([s.year for s in self._statements]))
+
+    def get(self, year: int or None = None, month: int or None = None,
+            day: int or None = None, account: Account or None = None) -> list[Statement]:
+
+        statements = self._statements
+
+        if year is not None:
+            statements = [s for s in statements if s.year == year]
+
+        if month is not None:
+            statements = [s for s in statements if s.month == month]
+
+        if day is not None:
+            statements = [s for s in statements if s.day == day]
+
+        if account is not None:
+            statements = [s for s in statements if s.account_id == account.id]
+
+        return statements
+
+    def upsert(self, statement: Statement):
+        for i, s in enumerate(self._statements):
+            # Update
+            if s == statement:
+                self._statements[i] = statement
+                break
+        else:
+            # Insert
+            self._statements.append(statement)
+
+    def get_monthly_statement_summary(self, year: int, month: int) -> MonthlyStatementSummary:
+        targets = [s for s in self._statements if s.year == year and s.month == month]
+        return MonthlyStatementSummary(year=year, month=month, statements=targets)
+
+    def get_yearly_statement_summary(self, year: int) -> YearlyStatementSummary:
+        summaries = []
+        for month in range(1, 13):
+            summary = self.get_monthly_statement_summary(year=year, month=month)
+            summaries.append(summary)
+
+        return YearlyStatementSummary(year=year, summaries=summaries)
+
+    def get_monthly_statement_detail(self, year: int, month: int, account: Account) -> list[Statement]:
+        return [s for s in self._statements if s.account_id == account.id and s.year == year and s.month == month]

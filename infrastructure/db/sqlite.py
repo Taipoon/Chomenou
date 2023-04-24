@@ -1,6 +1,7 @@
 import sqlite3
 
 from domain.aggregates import YearlyStatementSummary, MonthlyStatementSummary
+from domain.criterias import UpsertAccountCriteria
 from domain.entities import AccountType, Account, Statement
 from domain.exceptions import AccountNotFoundException
 from domain.repositories import IStatementRepository, IAccountTypeRepository, IAccountRepository
@@ -48,39 +49,33 @@ class AccountSQLite(SQLiteBase, IAccountRepository):
         super().__init__()
 
     def all(self) -> list[Account]:
-        sql = "SELECT `a`.`id`, `a`.`account_name`, `a`.`account_name_hepburn`, `a`.`account_type_id`, " \
-              "`a`.`default_amount`, `at`.`type_name`, `at`.`type_name_hepburn` " \
-              "FROM `accounts` AS `a` LEFT JOIN `account_types` AS `at` " \
-              "ON `a`.`account_type_id` = `at`.`id` " \
-              "ORDER BY `a`.`id`"
+        sql = "SELECT `id`, `account_name`, `account_name_hepburn`, `account_type_id`, `default_amount` " \
+              "FROM `accounts` " \
+              "ORDER BY `id`"
 
         accounts = []
         cursor: sqlite3.Cursor = self.conn.cursor()
         try:
             cursor.execute(sql)
             for row in cursor:
-                account_id, account_name, account_name_hepburn, \
-                    account_type_id, default_amount, type_name, type_name_hepburn = row
-                accounts.append(Account(account_id=account_id, account_name=account_name,
-                                        account_name_hepburn=account_name_hepburn,
-                                        account_type=AccountType(type_id=account_type_id,
-                                                                 type_name=type_name,
-                                                                 type_name_hepburn=type_name_hepburn),
-                                        default_amount=Amount(default_amount)))
+                account_id, account_name, account_name_hepburn, account_type_id, default_amount = row
+                accounts.append(
+                    Account(account_id=account_id, account_name=account_name,
+                            account_name_hepburn=account_name_hepburn,
+                            account_type_id=account_type_id, default_amount=Amount(default_amount)),
+                )
+
         finally:
             cursor.close()
             return accounts
 
     def find_by_id(self, account_id: int) -> Account:
-        sql = f"SELECT `a`.`id`, `a`.`account_name`, `a`.`account_name_hepburn`, " \
-              f"`a`.`account_type_id`, `a`.`default_amount`, " \
-              f"`at`.`type_name`, `at`.`type_name_hepburn` " \
-              f"FROM `accounts` AS `a` " \
-              f"LEFT JOIN `account_types` AS `at` " \
-              f"ON at.id = a.account_type_id " \
-              f"WHERE `a`.`id` = {account_id} " \
+        sql = f"SELECT `id`, `account_name`, `account_name_hepburn`, `account_type_id`, `default_amount` " \
+              f"FROM `accounts` " \
+              f"WHERE `id` = {account_id} " \
               f"LIMIT 1"
 
+        got_account = None
         cursor: sqlite3.Cursor = self.conn.cursor()
         try:
             cursor.execute(sql)
@@ -89,20 +84,75 @@ class AccountSQLite(SQLiteBase, IAccountRepository):
             if result is None:
                 raise AccountNotFoundException
 
-            i, an, anh, ati, da, tn, tnh = result
-            a = Account(account_id=i, account_name=an, account_name_hepburn=anh,
-                        account_type=AccountType(type_id=ati, type_name=tn, type_name_hepburn=tnh),
-                        default_amount=Amount(da))
-            return a
+            i, an, anh, ati, da = result
+            got_account = Account(account_id=i, account_name=an, account_name_hepburn=anh,
+                                  account_type_id=ati, default_amount=Amount(da))
+
+        finally:
+            cursor.close()
+            return got_account
+
+    def find_by_account_type_id(self, account_type_id: int) -> list[Account]:
+        sql = f"SELECT `id`, `account_name`, `account_name_hepburn`, `account_type_id`, `default_amount` " \
+              f"FROM `accounts` " \
+              f"WHERE `account_type_id` = {account_type_id} " \
+              f"ORDER BY `id`"
+
+        accounts = []
+        cursor: sqlite3.Cursor = self.conn.cursor()
+        try:
+            cursor.execute(sql)
+
+            for row in cursor:
+                i, an, anh, ati, da = row
+
+                accounts.append(
+                    Account(
+                        account_id=i, account_name=an, account_name_hepburn=anh,
+                        account_type_id=ati, default_amount=Amount(da),
+                    )
+                )
+
+        finally:
+            cursor.close()
+            return accounts
+
+    def update(self, account_id: int, update_account_criteria: UpsertAccountCriteria):
+
+        criteria_query_tokens = []
+
+        if update_account_criteria.name:
+            criteria_query_tokens.append(f"`account_name` = {update_account_criteria.name}")
+
+        if update_account_criteria.name_hepburn:
+            criteria_query_tokens.append(f"`account_name_hepburn` = {update_account_criteria.name_hepburn}")
+
+        if update_account_criteria.type_id:
+            criteria_query_tokens.append(f"`account_type_id` = {update_account_criteria.type_id}")
+
+        if update_account_criteria.default_amount:
+            criteria_query_tokens.append(f"`default_amount` = {update_account_criteria.default_amount.value}")
+
+        sql = f"UPDATE `accounts` " \
+              f"SET {', '.join(criteria_query_tokens)} " \
+              f"WHERE `id` = {account_id}"
+
+        cursor: sqlite3.Cursor = self.conn.cursor()
+        try:
+            cursor.execute(sql)
+            self.conn.commit()
+        except sqlite3.Error:
+            self.conn.rollback()
         finally:
             cursor.close()
 
-    def update_account(self, account_id: int, new_account: Account):
-        sql = f"UPDATE `accounts` " \
-              f"SET `account_name` = '{new_account.name}', " \
-              f"    `account_type_id` = {new_account.type.id}, " \
-              f"    `default_amount` = {new_account.default_amount.value} " \
-              f"WHERE `id` = {account_id}"
+    def create(self, new_account_criteria: UpsertAccountCriteria):
+        sql = f"INSERT INTO `accounts` " \
+               f"(`account_name`, `account_name_hepburn`, " \
+               f" `account_type_id`, `default_amount`) " \
+               f"VALUES " \
+               f"({new_account_criteria.name}, {new_account_criteria.name_hepburn}, " \
+               f" {new_account_criteria.type_id}, {new_account_criteria.default_amount.value})"
 
         cursor: sqlite3.Cursor = self.conn.cursor()
         try:
@@ -136,10 +186,9 @@ class StatementSQLite(SQLiteBase, IStatementRepository):
     def get(self, year: int = None, month: int = None, day: int = None,
             account_id: int or None = None) -> list[Statement]:
 
-        sql = f"SELECT `year`, `month`, `day`, `account_id`, " \
-              f"amount, `created_at` " \
+        sql = f"SELECT `year`, `month`, `day`, `account_id`, `amount` " \
               f"FROM `statements` " \
-              f"WHERE true "
+              f"WHERE 1 "
 
         if year is not None:
             sql += f"AND `year` = {year} "
@@ -153,14 +202,14 @@ class StatementSQLite(SQLiteBase, IStatementRepository):
         if account_id is not None:
             sql += f"AND `account_id` = {account_id} "
 
-        sql += f"ORDER BY `year`, `month`, `day`, `account_id`, `created_at`"
+        sql += f"ORDER BY `year`, `month`, `day`, `account_id`, `updated_at`"
 
         statements = []
         cursor = self.conn.cursor()
         try:
             cursor.execute(sql)
             for row in cursor:
-                year, month, day, account_id, total, updated_at = row
+                year, month, day, account_id, total = row
                 s = Statement(year=year, month=month, day=day,
                               account_id=account_id,
                               amount=Amount(amount=total))
@@ -170,6 +219,7 @@ class StatementSQLite(SQLiteBase, IStatementRepository):
             return statements
 
     def upsert(self, statement: Statement):
+        # TODO: トランザクションの管理、アプリケーション層で管理したい
         cursor = self.conn.cursor()
         try:
             sql = f"SELECT `amount` " \

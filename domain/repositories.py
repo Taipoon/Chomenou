@@ -1,6 +1,7 @@
 import abc
 
 from domain.aggregates import MonthlyStatementSummary, YearlyStatementSummary
+from domain.criterias import UpsertAccountCriteria
 from domain.entities import AccountType, Account, Statement
 
 
@@ -38,11 +39,32 @@ class IAccountRepository(abc.ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def update_account(self, account_id: int, new_account: Account):
+    def find_by_account_type_id(self, account_type_id: int) -> list[Account]:
         """
-        account_id で指定した勘定科目の情報を更新します。
+        引数で指定した account_type_id を持つ勘定科目のリストを返します。
+        結果は勘定科目IDで昇順ソートされています。
+        存在しない場合は AccountNotFoundException が送出されます。
+        :param account_type_id: 勘定科目タイプID
+        :return: 勘定科目のリスト
+        """
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def update(self, account_id: int, update_account_criteria: UpsertAccountCriteria):
+        """
+        引数で渡された account_id の情報を update_account_criteria で更新します。
+        account_id を持つ勘定科目が存在しない場合は AccountNotFoundException が送出されます。
         :param account_id: 勘定科目ID
-        :param new_account: 更新する勘定科目の情報
+        :param update_account_criteria: 勘定科目変更条件
+        :return: None
+        """
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def create(self, new_account_criteria: UpsertAccountCriteria):
+        """
+        引数で渡された new_account_criteria の情報で勘定科目を新規に作成します。
+        :param new_account_criteria: 勘定科目追加条件
         :return: None
         """
         raise NotImplementedError
